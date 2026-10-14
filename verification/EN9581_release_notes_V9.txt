@@ -1,0 +1,9 @@
+EN9581 V9
+Added the 14 October SYBR run; retained original 13 October LIDAR run.
+2 µl DNA throughout. Remade gBlocks are 1:10,000 per target, including row C.
+Rows C/G have half-concentration reverse primers; no signal or concentration multiplier is applied.
+Pooled SYBR has no locus-specific quantitation. Original row C input remains unconfirmed.
+Per-reporter historical SYBR/LIDAR efficiencies used for the new run with transfer assumptions disclosed.
+All 18,816 new raw RFU values match the three source exports; original raw data and calculations unchanged.
+Vial photo and public amplicon array retained; no fluorophore/quencher spacing disclosed.
+JavaScript render/calculator regression checks and Streamlit AppTest passed. Browser visual QA unavailable.

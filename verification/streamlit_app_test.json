@@ -1,11 +1,8 @@
 {
-  "version": "EN9581 V8",
-  "app_exceptions": 0,
-  "methods_images_embedded_and_verified": 2,
-  "aligned_lengths_verified": 22,
-  "photo_unchanged": true,
-  "assay_data_and_calculator_unchanged": true,
-  "explicit_prober_modification_scan": "passed; manuscript architecture panel not included",
+  "version": "EN9581 V9",
+  "exceptions": 0,
   "reproducible_build": true,
-  "visual_QA": "Array SVG rendered and inspected; browser startup unavailable."
+  "html_sha256": "8c57680ebb8034ef367ae0dcff12fd3339277ec84087aaaa0acb783ecbac7513",
+  "html_bytes": 9887998,
+  "visual_qa": "Unavailable: browser automation kernel exits before loading the page."
 }

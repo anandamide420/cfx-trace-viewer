@@ -1,0 +1,34 @@
+{
+  "version": "EN9581 V9",
+  "runs": [
+    {
+      "id": "en9581_2026_10_13",
+      "traceCounts": {
+        "CY5": 48,
+        "Quasar": 48
+      }
+    },
+    {
+      "id": "en9581_2026_10_14_sybr",
+      "traceCounts": {
+        "SYBR": 72,
+        "CY5": 48,
+        "Quasar": 48
+      }
+    }
+  ],
+  "historicalPoints": 381,
+  "newAccepted": 47,
+  "newModel": 41,
+  "checks": [
+    "All render functions execute",
+    "Original V8 raw data and numeric estimates unchanged",
+    "Run switching restores per-run defaults and calibration",
+    "SYBR mixed targets cannot generate locus quants",
+    "2 µl input for all DNA; no primer-concentration rescaling",
+    "All historical curve points and raw amplification traces preserved",
+    "Raw/model plots equal calculator fields in all units",
+    "10 ng/dose reference line retained"
+  ],
+  "limitation": "Mock DOM/Plotly runtime checks; browser visual QA unavailable"
+}
