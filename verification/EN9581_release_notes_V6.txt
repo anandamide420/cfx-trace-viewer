@@ -1,0 +1,1 @@
+EN9581 V6 adds a Batch report tab with the user-supplied EN9581 HowBadIsMyBatch link. It opens in a new tab. Navigation target and exact URL verified; JavaScript syntax valid; underlying data unchanged. Remote page content could not be inspected through the web tool.

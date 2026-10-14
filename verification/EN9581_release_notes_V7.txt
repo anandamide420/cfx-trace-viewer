@@ -1,0 +1,1 @@
+V7 adds an About LIDAR tab linking to the user-supplied YouTube presentation. Version labels and download names updated. Assay data, calculator logic and prior tabs otherwise unchanged.

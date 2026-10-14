@@ -1,0 +1,75 @@
+{
+  "checks": "passed",
+  "referenceCopies": 456222.7848484849,
+  "fits": [
+    {
+      "row": "E",
+      "ch": "CY5",
+      "ok": true,
+      "reason": "",
+      "lambda": 0.001322355967255802,
+      "low": -0.0057577965714288686,
+      "high": 0.008402508505940473,
+      "n": 7,
+      "r2": 0.04408248785811342,
+      "decay": 756.2260274555526,
+      "intercept": -13.909556357007528
+    },
+    {
+      "row": "F",
+      "ch": "Quasar",
+      "ok": true,
+      "reason": "",
+      "lambda": 0.0029213684527977916,
+      "low": -0.0047228231580902225,
+      "high": 0.010565560063685807,
+      "n": 6,
+      "r2": 0.21958950288215862,
+      "decay": 342.3053326403594,
+      "intercept": -13.489945311919849
+    },
+    {
+      "row": "G",
+      "ch": "CY5",
+      "ok": false,
+      "reason": "Fewer than four accepted lengths",
+      "n": 0
+    },
+    {
+      "row": "G",
+      "ch": "Quasar",
+      "ok": false,
+      "reason": "Fewer than four accepted lengths",
+      "n": 0
+    }
+  ],
+  "acceptedRaw": 13,
+  "acceptedModel": 13,
+  "standardCurveChecks": {
+    "imported": [
+      {
+        "source": "Cy5+Q705 dual",
+        "assays": 20,
+        "points": 117
+      },
+      {
+        "source": "Standard curve V2 \u2014 SYBR + Cy5 on Pfizer Spike, 40\u2013300 bp (row C repaired)",
+        "assays": 11,
+        "points": 66
+      },
+      {
+        "source": "Standard curve \u2014 SYBR + Q705 on Ori, 40\u2013300 bp (6-point, 2.3e6\u219223 copies/\u00b5L)",
+        "assays": 11,
+        "points": 66
+      }
+    ],
+    "points": 249,
+    "checks": "Imported points and original RFUs preserved exactly; flags respected; browsing sources leaves calculator estimates unchanged."
+  },
+  "axisChecks": "Linear default with zero baseline and multiple ticks; log option includes intermediate labels; matching chart ranges.",
+  "rawChartChecks": "All three units match raw calculator outputs; model outputs unchanged; common axes; raw chart invariant to Poisson toggle; underlying data unchanged.",
+  "renderFunctions": "All five tab render functions execute with mocked DOM and Plotly",
+  "visualQA": "Not re-run: browser automation unavailable in this environment on V1 validation.",
+  "reference_line": "Red horizontal line at 10 ng/dose on both charts; converts with current inputs for other display units.",
+  "data_identical_to_v4_except_version": true
+}
