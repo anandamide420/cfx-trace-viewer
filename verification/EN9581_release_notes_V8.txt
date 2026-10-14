@@ -1,0 +1,1 @@
+V8 adds the operator-supplied vial photograph and a public amplicon-array schematic to Methods. The schematic shows aligned product lengths and primer directions, without modification positions or FQ-coded identifiers. Numeric assay data and calculator behavior are unchanged. The supplied vial photograph is embedded unchanged.

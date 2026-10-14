@@ -1,8 +1,11 @@
 {
-  "version": "EN9581 V7",
+  "version": "EN9581 V8",
   "app_exceptions": 0,
-  "about_tab_link_verified": true,
-  "assay_data_unchanged": true,
-  "javascript_syntax": "passed",
-  "browser_visual_check": "unavailable: browser tool kernel exits unexpectedly"
+  "methods_images_embedded_and_verified": 2,
+  "aligned_lengths_verified": 22,
+  "photo_unchanged": true,
+  "assay_data_and_calculator_unchanged": true,
+  "explicit_prober_modification_scan": "passed; manuscript architecture panel not included",
+  "reproducible_build": true,
+  "visual_QA": "Array SVG rendered and inspected; browser startup unavailable."
 }

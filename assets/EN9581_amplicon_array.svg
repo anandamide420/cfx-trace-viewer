@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1160" height="1000" viewBox="0 0 1160 1000" role="img" aria-labelledby="title desc">
+<title id="title">EN9581 Spike and Ori amplicon arrays</title>
+<desc id="desc">Each target has one shared forward LIDAR primer and eleven reverse-primer positions. Lines show the aligned product lengths, including both primer ends. Arrowheads show direction schematically. Dye and quencher attachment positions are not shown.</desc>
+<rect width="1160" height="1000" fill="white"/>
+<style>text{font-family:Arial,sans-serif;fill:#26323a}.small{font-size:16px}.value{font-size:17px;font-weight:600}.title{font-size:27px;font-weight:700}</style>
+<text x="40" y="40" class="title">Two targets · eleven amplicon lengths per target</text>
+<text x="40" y="70" font-size="18">A shared forward LIDAR primer is paired with a different reverse primer in each column.</text>
+<text x="40" y="110" font-size="23" font-weight="700">Spike · Cy5</text>
+<text x="40" y="144" class="small">Plate column</text>
+<path d="M 190 137 h 30" stroke="#763c9d" stroke-width="4"/><path d="M 228 137 l -11 -6 v 12 z" fill="#763c9d"/>
+<text x="243" y="143" class="small">Common forward primer →</text>
+<path d="M 190.0 153 V 431" stroke="#e5eaed"/>
+<text x="190.0" y="456" text-anchor="middle" class="small">0</text>
+<path d="M 322.5 153 V 431" stroke="#e5eaed"/>
+<text x="322.5" y="456" text-anchor="middle" class="small">50</text>
+<path d="M 455.0 153 V 431" stroke="#e5eaed"/>
+<text x="455.0" y="456" text-anchor="middle" class="small">100</text>
+<path d="M 587.5 153 V 431" stroke="#e5eaed"/>
+<text x="587.5" y="456" text-anchor="middle" class="small">150</text>
+<path d="M 720.0 153 V 431" stroke="#e5eaed"/>
+<text x="720.0" y="456" text-anchor="middle" class="small">200</text>
+<path d="M 852.5 153 V 431" stroke="#e5eaed"/>
+<text x="852.5" y="456" text-anchor="middle" class="small">250</text>
+<path d="M 985.0 153 V 431" stroke="#e5eaed"/>
+<text x="985.0" y="456" text-anchor="middle" class="small">300</text>
+<path d="M 1117.5 153 V 431" stroke="#e5eaed"/>
+<text x="1117.5" y="456" text-anchor="middle" class="small">350</text>
+<text x="84" y="171" text-anchor="middle" class="value">1</text>
+<path d="M 190 166 H 311.9" stroke="#763c9d" stroke-width="3"/>
+<path d="M 311.9 166 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 305.9 166)"/>
+<text x="326.9" y="171" class="value">46 bp</text>
+<text x="84" y="196" text-anchor="middle" class="value">2</text>
+<path d="M 190 191 H 346.35" stroke="#763c9d" stroke-width="3" stroke-dasharray="7 4"/>
+<path d="M 346.35 191 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 340.35 191)"/>
+<text x="361.35" y="196" class="value">59 bp *</text>
+<text x="84" y="221" text-anchor="middle" class="value">3</text>
+<path d="M 190 216 H 364.9" stroke="#763c9d" stroke-width="3"/>
+<path d="M 364.9 216 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 358.9 216)"/>
+<text x="379.9" y="221" class="value">66 bp</text>
+<text x="84" y="246" text-anchor="middle" class="value">4</text>
+<path d="M 190 241 H 380.79999999999995" stroke="#763c9d" stroke-width="3"/>
+<path d="M 380.79999999999995 241 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 374.79999999999995 241)"/>
+<text x="395.79999999999995" y="246" class="value">72 bp</text>
+<text x="84" y="271" text-anchor="middle" class="value">5</text>
+<path d="M 190 266 H 420.54999999999995" stroke="#763c9d" stroke-width="3"/>
+<path d="M 420.54999999999995 266 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 414.54999999999995 266)"/>
+<text x="435.54999999999995" y="271" class="value">87 bp</text>
+<text x="84" y="296" text-anchor="middle" class="value">6</text>
+<path d="M 190 291 H 433.79999999999995" stroke="#763c9d" stroke-width="3" stroke-dasharray="7 4"/>
+<path d="M 433.79999999999995 291 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 427.79999999999995 291)"/>
+<text x="448.79999999999995" y="296" class="value">92 bp *</text>
+<text x="84" y="321" text-anchor="middle" class="value">7</text>
+<path d="M 190 316 H 470.9" stroke="#763c9d" stroke-width="3"/>
+<path d="M 470.9 316 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 464.9 316)"/>
+<text x="485.9" y="321" class="value">106 bp</text>
+<text x="84" y="346" text-anchor="middle" class="value">8</text>
+<path d="M 190 341 H 592.8" stroke="#763c9d" stroke-width="3"/>
+<path d="M 592.8 341 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 586.8 341)"/>
+<text x="607.8" y="346" class="value">152 bp</text>
+<text x="84" y="371" text-anchor="middle" class="value">9</text>
+<path d="M 190 366 H 712.05" stroke="#763c9d" stroke-width="3"/>
+<path d="M 712.05 366 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 706.05 366)"/>
+<text x="727.05" y="371" class="value">197 bp</text>
+<text x="84" y="396" text-anchor="middle" class="value">10</text>
+<path d="M 190 391 H 873.6999999999999" stroke="#763c9d" stroke-width="3"/>
+<path d="M 873.6999999999999 391 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 867.6999999999999 391)"/>
+<text x="888.6999999999999" y="396" class="value">258 bp</text>
+<text x="84" y="421" text-anchor="middle" class="value">11</text>
+<path d="M 190 416 H 1003.55" stroke="#763c9d" stroke-width="3"/>
+<path d="M 1003.55 416 l -12 -6 v 12 z" fill="#763c9d" transform="rotate(180 997.55 416)"/>
+<text x="1018.55" y="421" class="value">307 bp</text>
+<text x="610" y="486" text-anchor="middle" class="small">Aligned product length (bp), measured from the shared forward start</text>
+<text x="40" y="520" font-size="23" font-weight="700">Ori · Quasar 705</text>
+<text x="40" y="554" class="small">Plate column</text>
+<path d="M 190 547 h 30" stroke="#c45e00" stroke-width="4"/><path d="M 228 547 l -11 -6 v 12 z" fill="#c45e00"/>
+<text x="243" y="553" class="small">Common forward primer →</text>
+<path d="M 190.0 563 V 841" stroke="#e5eaed"/>
+<text x="190.0" y="866" text-anchor="middle" class="small">0</text>
+<path d="M 322.5 563 V 841" stroke="#e5eaed"/>
+<text x="322.5" y="866" text-anchor="middle" class="small">50</text>
+<path d="M 455.0 563 V 841" stroke="#e5eaed"/>
+<text x="455.0" y="866" text-anchor="middle" class="small">100</text>
+<path d="M 587.5 563 V 841" stroke="#e5eaed"/>
+<text x="587.5" y="866" text-anchor="middle" class="small">150</text>
+<path d="M 720.0 563 V 841" stroke="#e5eaed"/>
+<text x="720.0" y="866" text-anchor="middle" class="small">200</text>
+<path d="M 852.5 563 V 841" stroke="#e5eaed"/>
+<text x="852.5" y="866" text-anchor="middle" class="small">250</text>
+<path d="M 985.0 563 V 841" stroke="#e5eaed"/>
+<text x="985.0" y="866" text-anchor="middle" class="small">300</text>
+<path d="M 1117.5 563 V 841" stroke="#e5eaed"/>
+<text x="1117.5" y="866" text-anchor="middle" class="small">350</text>
+<text x="84" y="581" text-anchor="middle" class="value">1</text>
+<path d="M 190 576 H 317.2" stroke="#c45e00" stroke-width="3"/>
+<path d="M 317.2 576 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 311.2 576)"/>
+<text x="332.2" y="581" class="value">48 bp</text>
+<text x="84" y="606" text-anchor="middle" class="value">2</text>
+<path d="M 190 601 H 335.75" stroke="#c45e00" stroke-width="3" stroke-dasharray="7 4"/>
+<path d="M 335.75 601 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 329.75 601)"/>
+<text x="350.75" y="606" class="value">55 bp *</text>
+<text x="84" y="631" text-anchor="middle" class="value">3</text>
+<path d="M 190 626 H 362.25" stroke="#c45e00" stroke-width="3"/>
+<path d="M 362.25 626 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 356.25 626)"/>
+<text x="377.25" y="631" class="value">65 bp</text>
+<text x="84" y="656" text-anchor="middle" class="value">4</text>
+<path d="M 190 651 H 388.75" stroke="#c45e00" stroke-width="3"/>
+<path d="M 388.75 651 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 382.75 651)"/>
+<text x="403.75" y="656" class="value">75 bp</text>
+<text x="84" y="681" text-anchor="middle" class="value">5</text>
+<path d="M 190 676 H 415.25" stroke="#c45e00" stroke-width="3"/>
+<path d="M 415.25 676 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 409.25 676)"/>
+<text x="430.25" y="681" class="value">85 bp</text>
+<text x="84" y="706" text-anchor="middle" class="value">6</text>
+<path d="M 190 701 H 441.75" stroke="#c45e00" stroke-width="3" stroke-dasharray="7 4"/>
+<path d="M 441.75 701 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 435.75 701)"/>
+<text x="456.75" y="706" class="value">95 bp *</text>
+<text x="84" y="731" text-anchor="middle" class="value">7</text>
+<path d="M 190 726 H 468.25" stroke="#c45e00" stroke-width="3"/>
+<path d="M 468.25 726 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 462.25 726)"/>
+<text x="483.25" y="731" class="value">105 bp</text>
+<text x="84" y="756" text-anchor="middle" class="value">8</text>
+<path d="M 190 751 H 574.25" stroke="#c45e00" stroke-width="3"/>
+<path d="M 574.25 751 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 568.25 751)"/>
+<text x="589.25" y="756" class="value">145 bp</text>
+<text x="84" y="781" text-anchor="middle" class="value">9</text>
+<path d="M 190 776 H 712.05" stroke="#c45e00" stroke-width="3"/>
+<path d="M 712.05 776 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 706.05 776)"/>
+<text x="727.05" y="781" class="value">197 bp</text>
+<text x="84" y="806" text-anchor="middle" class="value">10</text>
+<path d="M 190 801 H 886.9499999999999" stroke="#c45e00" stroke-width="3"/>
+<path d="M 886.9499999999999 801 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 880.9499999999999 801)"/>
+<text x="901.9499999999999" y="806" class="value">263 bp</text>
+<text x="84" y="831" text-anchor="middle" class="value">11</text>
+<path d="M 190 826 H 1014.15" stroke="#c45e00" stroke-width="3"/>
+<path d="M 1014.15 826 l -12 -6 v 12 z" fill="#c45e00" transform="rotate(180 1008.15 826)"/>
+<text x="1029.15" y="831" class="value">311 bp</text>
+<text x="610" y="896" text-anchor="middle" class="small">Aligned product length (bp), measured from the shared forward start</text>
+<text x="40" y="943" class="small">← Reverse-primer direction; arrow sizes are schematic. Both panels use the same linear scale.</text>
+<text x="40" y="971" class="small">* Dashed rows: nominal 50 bp and 90 bp assays, excluded from concentration inference.</text></svg>

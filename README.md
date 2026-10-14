@@ -1,6 +1,6 @@
 # EN9581 LIDAR plate viewer
 
-Standalone EN9581 edition **V7**, containing the 13 October 2026 Pfizer EN9581 plate and three historical Cy5/Quasar calibration runs. The main publication viewer is not included or replaced.
+Standalone EN9581 edition **V8**, containing the 13 October 2026 Pfizer EN9581 plate and three historical Cy5/Quasar calibration runs. The main publication viewer is not included or replaced.
 
 ## Run
 
@@ -11,7 +11,7 @@ streamlit run streamlit_app.py
 
 For Streamlit Community Cloud, select this repository, branch `main`, and entrypoint `streamlit_app.py`. Python 3.12 is supported. No secrets or external database are required.
 
-The downloadable `viewer/LIDAR_Viewer_EN9581_V7.html` works offline. The Batch report tab opens an external website and requires internet access.
+The downloadable `viewer/LIDAR_Viewer_EN9581_V8.html` works offline. The Batch report tab opens an external website and requires internet access.
 
 ## Contents
 
@@ -19,6 +19,7 @@ The downloadable `viewer/LIDAR_Viewer_EN9581_V7.html` works offline. The Batch r
 - Raw and Poisson-corrected DNA estimates with matching linear/log axes and a red 10 ng/dose reference line.
 - Imported standard-curve points, historical traces, efficiencies, QC flags and CSV downloads.
 - Primer-aligned lengths, preparation details and original export provenance.
+- Methods figures: supplied EN9581 vial photograph and aligned amplicon-array schematic.
 - External EN9581 batch-report link.
 - About LIDAR tab with a link to the presentation on YouTube.
 
@@ -38,4 +39,4 @@ Historical dual-LIDAR per-assay efficiencies are used with same-plate concentrat
 python build_viewer.py
 ```
 
-This reproduces the reviewed V7 HTML byte-for-byte. Plotly is bundled in `vendor/plotly.min.js`; its upstream license notice is retained. Verification and release notes are included under `verification/`.
+This reproduces the reviewed V8 HTML byte-for-byte. Plotly is bundled in `vendor/plotly.min.js`; its upstream license notice is retained. Verification and release notes are included under `verification/`.
