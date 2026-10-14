@@ -1,6 +1,6 @@
 # EN9581 LIDAR plate viewer
 
-Standalone EN9581 edition **V10**, containing the 13 October LIDAR-only and 14 October 2026 LIDAR + SYBR Pfizer EN9581 plates, plus three historical calibration runs. The Run selector defaults to the new SYBR plate. The main publication viewer is not included or replaced.
+Standalone EN9581 edition **V11**, containing the 13 October LIDAR-only and 14 October 2026 LIDAR + SYBR Pfizer EN9581 plates, plus three historical calibration runs. The Run selector defaults to the new SYBR plate. The main publication viewer is not included or replaced.
 
 ## Run
 
@@ -11,7 +11,7 @@ streamlit run streamlit_app.py
 
 For Streamlit Community Cloud, select this repository, branch `main`, and entrypoint `streamlit_app.py`. Python 3.12 is supported. No secrets or external database are required.
 
-The downloadable `viewer/LIDAR_Viewer_EN9581_V10.html` works offline. The Batch report tab opens an external website and requires internet access.
+The downloadable `viewer/LIDAR_Viewer_EN9581_V11.html` works offline. The Batch report tab opens an external website and requires internet access.
 
 ## Contents
 
@@ -25,7 +25,7 @@ The downloadable `viewer/LIDAR_Viewer_EN9581_V10.html` works offline. The Batch 
 
 ## Calculation inputs and unresolved details
 
-The vaccine defaults are 1:100 dilution and 2 µl per reaction. Single-target gBlock controls use 1 ng/µl stocks diluted 1:10,000, with 2 µl per reaction and a 400 bp working mass convention. The 300 µl dose and 7,824 bp plasmid-equivalent length remain editable assumptions.
+The vaccine defaults are 1:100 dilution and 2 µl per reaction. gBlock controls use target-specific stock means of 1.47375 ng/µl Spike and 1.01 ng/µl Ori, diluted 1:10,000, with 2 µl per reaction and a 400 bp working mass convention. The 300 µl dose and 7,824 bp plasmid-equivalent length remain editable assumptions.
 
 In the 14 October run, row C contains 1:10,000 of each remade gBlock and row G LIDAR estimates are enabled. Each reverse primer in pooled rows C/G is at half its single-target concentration; this does not halve the DNA input and no twofold correction is applied. In the original 13 October run, row G estimates remain withheld because that preparation's row C input is unconfirmed. Mixed-target SYBR in C/G remains visible as traces and Cqs, but supplies no locus-specific concentration estimate. Raw traces and Cqs remain available. The shortest Ori assay assumes the initially identified Ori_48bp oligo; the alternate Ori_45bp would have a different span. Spike's shortest aligned span is 46 bp.
 
@@ -39,4 +39,8 @@ The original run retains historical dual-LIDAR efficiencies. The new run uses re
 python build_viewer.py
 ```
 
-This reproduces the reviewed V10 HTML byte-for-byte. Plotly is bundled in `vendor/plotly.min.js`; its upstream license notice is retained. Verification and release notes are included under `verification/`.
+This reproduces the reviewed V11 HTML byte-for-byte. Plotly is bundled in `vendor/plotly.min.js`; its upstream license notice is retained. Verification and release notes are included under `verification/`.
+
+## V11 stock concentration inputs
+
+Methods includes IDT reported values (1/1 ng/µl Spike/Ori), electrophoresis main peaks (0.535/0.340), AccuGreen (1.36/0.700) and NanoDrop (3.0/2.0). The requested equal-weight means are separate editable defaults in both runs. No additional premeasurement dilution correction is applied. IDT is a manufacturer-reported value, not a laboratory replicate. Run 1’s proposed 1:100,000 gBlock dilution remains unconfirmed and its 1:10,000 default is unchanged. Original exported traces and historical calibration observations/efficiencies are preserved.

@@ -1,5 +1,5 @@
 {
-  "version": "EN9581 V10",
+  "version": "EN9581 V11",
   "defaultRun": 1,
   "runs": [
     {
@@ -25529,11 +25529,10 @@
       "hasSybr": false,
       "dualConfirmed": false,
       "reversePrimerFraction": null,
-      "concentrationNote": "Original run: row C per-target input remains unconfirmed. The remade 1:10,000-per-target controls belong to the 14 October run.",
-      "protocolNote": "Original Cy5/Quasar plate without SYBR or TaqMan. Row G concentration estimates remain withheld because the original row C input has not been confirmed.",
+      "concentrationNote": "Original run: row C per-target input remains unconfirmed. The remade 1:10,000-per-target controls belong to the 14 October run. Stock defaults use the four-value arithmetic mean separately for Spike and Ori; see Methods.",
+      "protocolNote": "Original Cy5/Quasar plate without SYBR or TaqMan. Row G concentration estimates remain withheld because the original row C input has not been confirmed. The suggested 1:100,000 gBlock dilution remains unconfirmed; the calculator still defaults to the recorded 1:10,000.",
       "efficiencyNote": "Original run: historical Cy5+Q705 dual-LIDAR efficiencies, with the original same-plate gBlock controls.",
       "defaults": {
-        "stock": 1,
         "gdil": 10000,
         "stdvol": 2,
         "gbp": 400,
@@ -25541,7 +25540,9 @@
         "vdil": 100,
         "samplevol": 2,
         "dose": 300,
-        "plasmidbp": 7824
+        "plasmidbp": 7824,
+        "stockSpike": 1.47375,
+        "stockOri": 1.01
       },
       "calibrationSourceIndices": [
         0
@@ -67792,11 +67793,10 @@
       "hasSybr": true,
       "dualConfirmed": true,
       "reversePrimerFraction": 0.5,
-      "concentrationNote": "Remade gBlocks: 1:10,000 per target in row C, equal to each corresponding single-target control. Each well received 2 \u00b5l DNA.",
+      "concentrationNote": "Remade gBlocks: 1:10,000 per target in row C, equal to each corresponding single-target control. Each well received 2 \u00b5l DNA. Stock defaults use the four-value arithmetic mean separately for Spike and Ori; see Methods.",
       "protocolNote": "SYBR is present with Cy5 and Quasar 705. Row C contains 1:10,000 of each remade gBlock; each well received 2 \u00b5l DNA. Each reverse primer in pooled rows C/G is at half its single-target concentration. This is a primer-input difference, not a twofold template dilution; RFUs and DNA estimates are not multiplied by two. SYBR in C/G is a combined signal and is not assigned to an individual locus.",
       "efficiencyNote": "SYBR run: measured per-assay, per-reporter efficiencies from the historical Spike+SYBR and Ori+SYBR dilution series. Same-plate A/B/C controls anchor concentration. Transfer to pooled rows C/G with half-concentration reverse primers is an assumption.",
       "defaults": {
-        "stock": 1,
         "gdil": 10000,
         "stdvol": 2,
         "gbp": 400,
@@ -67804,7 +67804,9 @@
         "vdil": 100,
         "samplevol": 2,
         "dose": 300,
-        "plasmidbp": 7824
+        "plasmidbp": 7824,
+        "stockSpike": 1.47375,
+        "stockOri": 1.01
       },
       "calibration": {
         "CY5": {
@@ -126265,5 +126267,40 @@
         "setup": "SYBR_Q705_Ori_40-300bp_Serial_Dilution_11_amplicons-plate.xlsx"
       }
     }
-  ]
+  ],
+  "stockConcentrations": {
+    "units": "ng/\u00b5l",
+    "sources": [
+      {
+        "method": "IDT reported concentration",
+        "Spike": 1.0,
+        "Ori": 1.0,
+        "provenance": "Manufacturer value reported by Kevin McKernan"
+      },
+      {
+        "method": "Electrophoresis main peak",
+        "Spike": 0.535,
+        "Ori": 0.34,
+        "provenance": "Supplied screenshots: 535 and 340 pg/\u00b5l; excludes markers and minor high-size peaks"
+      },
+      {
+        "method": "AccuGreen",
+        "Spike": 1.36,
+        "Ori": 0.7,
+        "provenance": "Supplied Qubit readout screenshots: original calculated sample concentrations"
+      },
+      {
+        "method": "NanoDrop",
+        "Spike": 3.0,
+        "Ori": 2.0,
+        "provenance": "Supplied pedestal readout screenshots: displayed DNA concentrations"
+      }
+    ],
+    "aggregation": "Equal-weight arithmetic mean of four supplied values per target, as requested by the operator. The IDT value is a reported concentration, not an additional laboratory replicate.",
+    "application": "Applied as the stock-input default in both EN9581 runs; dilution denominators remain unchanged. Historical dilution-series records and measured efficiencies retain their original calibration basis.",
+    "means": {
+      "Spike": 1.47375,
+      "Ori": 1.01
+    }
+  }
 }

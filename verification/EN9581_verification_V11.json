@@ -1,0 +1,28 @@
+{
+  "version": "EN9581 V11",
+  "means": {
+    "Spike": 1.47375,
+    "Ori": 1.01
+  },
+  "runs": [
+    {
+      "run": "en9581_2026_10_13",
+      "accepted": 13,
+      "model": 13
+    },
+    {
+      "run": "en9581_2026_10_14_sybr",
+      "accepted": 47,
+      "model": 41
+    }
+  ],
+  "checks": [
+    "Source RFU, Cqs, lengths and historical coefficients unchanged",
+    "Spike raw/model estimates scale by 1.47375; Ori by 1.01 in both runs",
+    "Fragmentation slopes and exclusions unchanged",
+    "Separate editable target stocks; CSV exports both inputs and applied stock",
+    "Run 1 dilution remains 1:10000; original row G remains withheld",
+    "Methods table contains four sources and arithmetic means"
+  ],
+  "visual_qa": "Browser automation unavailable"
+}

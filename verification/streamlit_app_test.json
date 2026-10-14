@@ -1,13 +1,6 @@
 {
-  "version": "EN9581 V10",
-  "Streamlit_exceptions": 0,
-  "checks": [
-    "Separate collapsible keys below amplification and melt plots",
-    "Keys scroll within 180 px and never overlay plot",
-    "7, 14 and 168 trace render checks",
-    "Click-to-hide/show preserved",
-    "Source data unchanged apart from version",
-    "Calculator accepted-record counts unchanged"
-  ],
+  "version": "EN9581 V11",
+  "exceptions": 0,
+  "reproducible_build": true,
   "visual_qa": "Browser automation unavailable"
 }
