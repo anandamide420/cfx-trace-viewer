@@ -1,6 +1,6 @@
 # EN9581 LIDAR plate viewer
 
-Standalone EN9581 edition **V9**, containing the 13 October LIDAR-only and 14 October 2026 LIDAR + SYBR Pfizer EN9581 plates, plus three historical calibration runs. The Run selector defaults to the new SYBR plate. The main publication viewer is not included or replaced.
+Standalone EN9581 edition **V10**, containing the 13 October LIDAR-only and 14 October 2026 LIDAR + SYBR Pfizer EN9581 plates, plus three historical calibration runs. The Run selector defaults to the new SYBR plate. The main publication viewer is not included or replaced.
 
 ## Run
 
@@ -11,7 +11,7 @@ streamlit run streamlit_app.py
 
 For Streamlit Community Cloud, select this repository, branch `main`, and entrypoint `streamlit_app.py`. Python 3.12 is supported. No secrets or external database are required.
 
-The downloadable `viewer/LIDAR_Viewer_EN9581_V9.html` works offline. The Batch report tab opens an external website and requires internet access.
+The downloadable `viewer/LIDAR_Viewer_EN9581_V10.html` works offline. The Batch report tab opens an external website and requires internet access.
 
 ## Contents
 
@@ -39,4 +39,4 @@ The original run retains historical dual-LIDAR efficiencies. The new run uses re
 python build_viewer.py
 ```
 
-This reproduces the reviewed V9 HTML byte-for-byte. Plotly is bundled in `vendor/plotly.min.js`; its upstream license notice is retained. Verification and release notes are included under `verification/`.
+This reproduces the reviewed V10 HTML byte-for-byte. Plotly is bundled in `vendor/plotly.min.js`; its upstream license notice is retained. Verification and release notes are included under `verification/`.

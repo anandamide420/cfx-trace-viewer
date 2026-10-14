@@ -1,5 +1,5 @@
 'use strict';
-// EN9581 V9. All input data are embedded in DATA. No network calibration,
+// EN9581 V10. All input data are embedded in DATA. No network calibration,
 // hidden target normalization or data from another vaccine lot is used.
 const $=id=>document.getElementById(id), NA=6.02214076e23;
 let DATA={...BUNDLE,...BUNDLE.runs[BUNDLE.defaultRun]};
@@ -34,7 +34,27 @@ function cq(ch,well){const d=DATA.amp[ch],y=d.w[well];return y?crossing(d.x,base
 function derivative(x,y){return y.map((_,i)=>{const a=Math.max(0,i-1),b=Math.min(y.length-1,i+1);return Number.isFinite(y[a])&&Number.isFinite(y[b])?-(y[b]-y[a])/(x[b]-x[a]):null;});}
 function mapping(ch,col,row){return DATA.amplicons[targetFor(ch,row)][col-1];}
 function flagged(col){return [50,90].includes(nominal[col-1]);}
-function plot(id,data,title,x,y,extra={},overlays={}){return Plotly.react(id,data,{title:{text:title,font:{size:20}},font:{family:'system-ui',size:14},margin:{l:85,r:25,t:90,b:65},xaxis:{title:{text:x}},yaxis:{title:{text:y},...extra},legend:{orientation:'h',y:1.12},hovermode:'closest',paper_bgcolor:'#fff',plot_bgcolor:'#fff',...overlays},{responsive:true,displaylogo:false,toImageButtonOptions:{format:'png',scale:2}});}
+// Keep the trace key in normal document flow below the chart. A bounded,
+// scrollable key preserves the full plotting area even for an entire plate.
+// The buttons retain the native legend's click-to-hide behavior.
+function traceKey(id,data){
+ let key=$(id+'-key');
+ if(!key){key=document.createElement('details');key.id=id+'-key';key.className='trace-key';key.open=true;$(id).after(key);}
+ key.innerHTML='<summary>Curve key · '+data.length+' traces</summary><div class="trace-key-items"></div>';
+ const items=key.querySelector('.trace-key-items');
+ data.forEach((trace,i)=>{
+  const button=document.createElement('button');button.type='button';button.className='trace-key-item';button.setAttribute('aria-pressed','true');button.title='Click to hide or show this curve';
+  const swatch=document.createElement('span');swatch.className='trace-key-swatch';swatch.style.borderColor=trace.line?.color||'#586671';swatch.style.borderTopStyle=trace.line?.dash==='dot'?'dotted':trace.line?.dash&&trace.line.dash!=='solid'?'dashed':'solid';
+  const label=document.createElement('span');label.textContent=trace.name||'Curve '+(i+1);button.append(swatch,label);
+  button.onclick=()=>{const visible=button.getAttribute('aria-pressed')!=='true';button.setAttribute('aria-pressed',String(visible));Plotly.restyle(id,{visible:visible?true:'legendonly'},[i]);};items.append(button);
+ });
+}
+function plot(id,data,title,x,y,extra={},overlays={}){
+ const isTrace=id==='ampplot'||id==='meltplot';
+ const result=Plotly.react(id,data,{title:{text:title,font:{size:20}},font:{family:'system-ui',size:14},margin:{l:85,r:25,t:isTrace?60:90,b:65},xaxis:{title:{text:x}},yaxis:{title:{text:y},...extra},showlegend:!isTrace,legend:{orientation:'h',y:1.12},hovermode:'closest',paper_bgcolor:'#fff',plot_bgcolor:'#fff',...overlays},{responsive:true,displaylogo:false,toImageButtonOptions:{format:'png',scale:2}});
+ if(isTrace)traceKey(id,data);
+ return result;
+}
 function plate(){let h='<table><thead><tr><th><button data-all="1">ALL</button></th>';
 for(let c=1;c<=12;c++)h+='<th><button data-col="'+c+'">'+c+'<br><small>'+(c===12?'NTC':mapping('CY5',c).bp+'/'+mapping('Quasar',c).bp)+'</small></button></th>';h+='</tr></thead><tbody>';
 for(const r of Object.keys(rows)){h+='<tr><td><button data-row="'+r+'">'+r+' · '+rows[r]+'</button></td>';for(let c=1;c<=12;c++){const w=r+c;h+='<td><button data-well="'+w+'" class="'+(selected.has(w)?'picked':'')+'">'+w+'</button></td>';}h+='</tr>';}h+='</tbody></table><small>Column headers: aligned Spike / Ori bp. Click a well to toggle it; row and column buttons replace the selection.</small>';$('plate').innerHTML=h;
@@ -186,16 +206,16 @@ if(d&&col>0){for(const row of 'ABCDEFG'){const well=row+col,y=d.w[well];if(!y)co
 $('standardtraceinfo').textContent=tr.length?'Original RFU traces for nominal '+n+' bp, '+ch+'. A–F are 1:1,000 through 1:100,000,000; G is NTC.':'The selected reporter/nominal assay is not present in this historical run.';
 plot('standardtraces',tr,'Historical amplification traces','Cycle','Raw RFU');}
 $('standardtracedetail').addEventListener('toggle',()=>{if($('standardtracedetail').open)drawHistoricalTraces();});
-$('downloadstandards').onclick=()=>download('EN9581_historical_standard_curves_V9.csv',csv(standardPointRecords()),'text/csv');
-$('downloadstandardtraces').onclick=()=>{const rr=[];for(const s of DATA.historicalStandards)for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(s[kind]))for(const [well,y] of Object.entries(d.w))y.forEach((rfu,i)=>rr.push({source:s.key,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_historical_traces_V9.csv',csv(rr),'text/csv');};
+$('downloadstandards').onclick=()=>download('EN9581_historical_standard_curves_V10.csv',csv(standardPointRecords()),'text/csv');
+$('downloadstandardtraces').onclick=()=>{const rr=[];for(const s of DATA.historicalStandards)for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(s[kind]))for(const [well,y] of Object.entries(d.w))y.forEach((rfu,i)=>rr.push({source:s.key,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_historical_traces_V10.csv',csv(rr),'text/csv');};
 
 function redraw(){if(currentTab==='traces')drawTraces();if(currentTab==='size')drawSize();if(currentTab==='dna')drawDNA();if(currentTab==='standards')drawStandards();}
 $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;for(const id of ['traces','size','dna','standards','seq','methods','batch','about'])$(id).hidden=id!==currentTab;$('tabs').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));redraw();});
 for(const e of document.querySelectorAll('input,select'))e.addEventListener('change',redraw);
-$('downloadcsv').onclick=()=>{drawDNA();download('EN9581_calculations_V9.csv',csv(latest.map(r=>({...r,display_poisson:$('poisson').checked,version:BUNDLE.version,run_id:DATA.id}))),'text/csv');};
-$('downloadjson').onclick=()=>download('EN9581_data_V9.json',JSON.stringify(BUNDLE,null,2),'application/json');
-$('downloadalign').onclick=()=>download('EN9581_amplicon_alignment_V9.csv',csv(Object.entries(DATA.amplicons).flatMap(([target,a])=>a.map(m=>({target,column:m.column,oligo:m.name,nominal_bp:m.nominal,aligned_bp:m.bp,start:m.start,end:m.end,forward:m.forward,reverse:m.reverse})))),'text/csv');
-$('downloadraw').onclick=()=>{const rr=[];for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(DATA[kind]))for(const [well,yy] of Object.entries(d.w))yy.forEach((rfu,i)=>rr.push({run_id:DATA.id,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_'+DATA.id+'_raw_traces_V9.csv',csv(rr),'text/csv');};
+$('downloadcsv').onclick=()=>{drawDNA();download('EN9581_calculations_V10.csv',csv(latest.map(r=>({...r,display_poisson:$('poisson').checked,version:BUNDLE.version,run_id:DATA.id}))),'text/csv');};
+$('downloadjson').onclick=()=>download('EN9581_data_V10.json',JSON.stringify(BUNDLE,null,2),'application/json');
+$('downloadalign').onclick=()=>download('EN9581_amplicon_alignment_V10.csv',csv(Object.entries(DATA.amplicons).flatMap(([target,a])=>a.map(m=>({target,column:m.column,oligo:m.name,nominal_bp:m.nominal,aligned_bp:m.bp,start:m.start,end:m.end,forward:m.forward,reverse:m.reverse})))),'text/csv');
+$('downloadraw').onclick=()=>{const rr=[];for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(DATA[kind]))for(const [well,yy] of Object.entries(d.w))yy.forEach((rfu,i)=>rr.push({run_id:DATA.id,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_'+DATA.id+'_raw_traces_V10.csv',csv(rr),'text/csv');};
 // Run switching changes data, controls and provenance together. Confirmation
 // from the new preparation must never unlock the original run's row G.
 const runInputs={};let activeRun=null;

@@ -1,8 +1,13 @@
 {
-  "version": "EN9581 V9",
-  "exceptions": 0,
-  "reproducible_build": true,
-  "html_sha256": "8c57680ebb8034ef367ae0dcff12fd3339277ec84087aaaa0acb783ecbac7513",
-  "html_bytes": 9887998,
-  "visual_qa": "Unavailable: browser automation kernel exits before loading the page."
+  "version": "EN9581 V10",
+  "Streamlit_exceptions": 0,
+  "checks": [
+    "Separate collapsible keys below amplification and melt plots",
+    "Keys scroll within 180 px and never overlay plot",
+    "7, 14 and 168 trace render checks",
+    "Click-to-hide/show preserved",
+    "Source data unchanged apart from version",
+    "Calculator accepted-record counts unchanged"
+  ],
+  "visual_qa": "Browser automation unavailable"
 }

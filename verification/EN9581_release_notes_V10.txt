@@ -1,0 +1,1 @@
+V10: Amplification and melt keys moved to separate collapsible panels below plots. Long keys scroll; entries toggle curves. No data or calculation changes.
