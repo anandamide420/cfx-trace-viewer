@@ -1,6 +1,7 @@
 {
-  "version": "EN9581 V11",
+  "version": "EN9581 V12",
   "exceptions": 0,
   "reproducible_build": true,
-  "visual_qa": "Browser automation unavailable"
+  "html_sha256": "9ff84801224a35af0ee5fdcee0387b796e1a2edc247dc3e258db002b2ed8a883",
+  "html_bytes": 10482026
 }

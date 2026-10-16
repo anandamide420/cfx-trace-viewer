@@ -1,0 +1,9 @@
+EN9581 V12
+Added the 16 October Bio-Rad heat/Triton SYBR plate.
+Vaccine 1:50; gBlocks 1:20,000 per target; 2 ul DNA and 1 ul reverse-primer mix.
+Original two public plates and all their calculations preserved.
+Raw RFU values, source hashes and run-specific defaults verified.
+Historical efficiencies and bench/QC exclusions retained; mixed SYBR is not locus-assigned.
+Long mixed Spike control behavior flagged separately from the fitted model.
+No MIC data or additional prober-design details published.
+Calculation regression and Streamlit AppTest passed; build reproduced byte-for-byte.

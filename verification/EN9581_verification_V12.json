@@ -1,0 +1,14 @@
+{
+  "version": "EN9581 V12",
+  "runs": 3,
+  "new_run_accepted_estimates": 50,
+  "checks": [
+    "Original two runs: data, inputs and all calculations unchanged",
+    "New run matches private calculation engine for all records and fits",
+    "All original exported amplification and melt values preserved",
+    "New source links/hashes and run-specific dilution labels verified",
+    "Input edits remain scoped to selected run",
+    "Mixed SYBR remains unassigned; historical exclusions retained",
+    "Long mixed-control behavior explicitly flagged"
+  ]
+}
