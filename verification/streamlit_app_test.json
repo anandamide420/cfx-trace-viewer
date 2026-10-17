@@ -1,7 +1,8 @@
 {
-  "version": "EN9581 V12",
-  "exceptions": 0,
+  "version": "EN9581 V13",
   "reproducible_build": true,
-  "html_sha256": "9ff84801224a35af0ee5fdcee0387b796e1a2edc247dc3e258db002b2ed8a883",
-  "html_bytes": 10482026
+  "html_sha256": "c24661e5c724b6070a2d2ebd69547f8b760b55b97f533e3ff7676d19b731ad18",
+  "html_bytes": 9804045,
+  "python_syntax": "passed",
+  "streamlit_AppTest": "Not rerun: Streamlit unavailable in bundled Python runtime. Wrapper changes are version/file-path substitutions only. Live deployment checked separately."
 }

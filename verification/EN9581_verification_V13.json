@@ -1,0 +1,14 @@
+{
+  "version": "EN9581 V13",
+  "runs": 2,
+  "removed": "en9581_2026_10_14_sybr",
+  "checks": [
+    "Retained run objects byte-equivalent after JSON parsing",
+    "All retained measured/manual calculations unchanged",
+    "Historical standard data, aligned lengths and stocks unchanged",
+    "Removed run absent from selector and embedded download bundle",
+    "Run-specific edited inputs survive selection changes",
+    "Separate screen interactive charts execute for both runs, all channels and NTCs"
+  ],
+  "report_plot_calls": 152
+}

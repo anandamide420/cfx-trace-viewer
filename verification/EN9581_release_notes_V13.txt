@@ -1,0 +1,1 @@
+Removed only the 14 October 2026 SYBR plate at the operator’s request. The 13 and 16 October observations, inputs, efficiencies, exclusions and calculator rules are unchanged. Default remains 16 October. New 17 October run screened separately, not promoted.
