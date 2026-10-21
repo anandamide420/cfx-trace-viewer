@@ -1,0 +1,1 @@
+V22: reporter-specific DNA coverage; all nine non-flagged LIDAR assays on dilution plates; independent calibration selection by default; opt-in limited-range five-point calibration support; 50/90 exclusions and missing-crossing handling retained. Paired reporter agreement remains on shared lengths. No source curves or calibration fits changed.

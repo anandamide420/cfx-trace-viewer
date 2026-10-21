@@ -1,5 +1,5 @@
 'use strict';
-// EN9581 V21. All input data are embedded in DATA. No network calibration,
+// EN9581 V22. All input data are embedded in DATA. No network calibration,
 // hidden target normalization or data from another vaccine lot is used.
 const $=id=>document.getElementById(id), NA=6.02214076e23;
 let DATA={...BUNDLE,...BUNDLE.runs[BUNDLE.defaultRun]};
@@ -13,6 +13,8 @@ function targetFor(ch,row){if(DATA.dilutionSeries&&ch==='SYBR')return null;if(ch
 function channelLabel(ch,row){if(ch==='FAM'||ch==='HEX')return ch+' TaqMan · '+targets[ch];if(ch==='SYBR'&&!DATA.hasSybr)return 'Green background · no SYBR dye';return ch==='SYBR'?'SYBR · '+(targetFor(ch,row)||'Spike + Ori'):targets[ch];}
 function assayLengthLabel(ch,row,col){return targetFor(ch,row)?mapping(ch,col,row).bp+' bp':DATA.amplicons.Spike[col-1].bp+' / '+DATA.amplicons.Ori[col-1].bp+' bp';}
 function calibrationFor(ch,row,nom){return ch==='SYBR'?DATA.sybrCalibration?.[targetFor(ch,row)]?.[nom]:DATA.calibration[ch]?.[nom];}
+function limitedCalibration(a){return !!(a&&!a.ok&&a.n===5&&a.flags?.length&&a.flags.every(f=>f==='n=5'));}
+function acceptedCalibration(a){return !!(a&&(a.ok||($('allowFive').checked&&limitedCalibration(a))));}
 function efficiencySource(ch,row){return DATA.calibrationSources?.[ch+':'+targetFor(ch,row)]||'Cy5+Q705 dual';}
 let rows={A:'EN9581 · Spike',B:'EN9581 · Ori',C:'FL8095 · Spike',D:'FL8095 · Ori',E:'gBlock · Spike',F:'gBlock · Ori'};
 let pairs={A:'E',B:'F',C:'E',D:'F'}; const nominal=[40,50,60,70,80,90,100,150,200,250,300];
@@ -108,9 +110,9 @@ const rec={well,control,channel:ch,target:targetFor(ch,row),run_id:DATA.id,rever
 if(flagged(col))rec.reason='Bench-excluded nominal '+nom+' bp assay';
 else if($('matched').checked&&!matchedCalibration(ch,row,nom))rec.reason='Not accepted in both reporter calibrations';
 else if(sampleCq===null||refCq===null)rec.reason='No threshold crossing in sample or control';
-else if(a&&!a.ok)rec.reason='Historical calibration QC failed: '+a.flags.join('; ');
+else if(a&&!acceptedCalibration(a))rec.reason=limitedCalibration(a)?'Five-point calibration; enable limited-range option or repeat full dilution series':'Historical calibration QC failed: '+a.flags.join('; ');
 else if(!(E>1&&E<=2.2))rec.reason='No accepted per-assay efficiency';
-else {rec.raw=estimateCopies(refCopies,refCq,sampleCq,E);
+else {rec.calibration_warning=limitedCalibration(a)?'Five-point calibration: limited historical range; not a validated LOD/LOQ':'';rec.raw=estimateCopies(refCopies,refCq,sampleCq,E);
 // Historical points are concentrations of loaded dilution. This is only
 // a transfer-range warning; it is not a validated detection/quantitation limit.
 if(a?.points?.length){const lo=Math.min(...a.points.map(p=>10**p[0])),hi=Math.max(...a.points.map(p=>10**p[0]));if(rec.raw/P.samplevol<lo||rec.raw/P.samplevol>hi)rec.model_reason='Outside historical observed concentration range';}}
@@ -173,12 +175,12 @@ $('dnaplot').hidden=!poisson;
 $('dnacharts').style.gridTemplateColumns=poisson?'':'1fr';
 plot('rawquantplot',rawTraces,'Raw quants · no Poisson correction','Aligned amplicon length (bp)',label,{...axis},referenceOverlay);
 if(poisson)plot('dnaplot',modelTraces,'After correction · zero for nonpositive slopes','Aligned amplicon length (bp)',label,{...axis},referenceOverlay);
-$('dnatable').innerHTML=table(['Well / control','Reporter / target','Aligned bp','Sample Cq','Control Cq','E','Raw ng/dose','After correction ng/dose','Status'],latest.map(r=>[r.well+' / '+r.control,channelLabel(r.channel,r.row),r.bp,fmt(r.sampleCq),fmt(r.refCq),fmt(r.E),fmt(r.raw_ng_per_dose),fmt(r.model_ng_per_dose),r.reason||(r.zero_correction_applied?'0% correction applied':r.model_reason)||'Accepted']));}
+$('dnatable').innerHTML=table(['Well / control','Reporter / target','Aligned bp','Sample Cq','Control Cq','E','Raw ng/dose','After correction ng/dose','Status'],latest.map(r=>[r.well+' / '+r.control,channelLabel(r.channel,r.row),r.bp,fmt(r.sampleCq),fmt(r.refCq),fmt(r.E),fmt(r.raw_ng_per_dose),fmt(r.model_ng_per_dose),[r.reason||(r.zero_correction_applied?'0% correction applied':r.model_reason),r.calibration_warning].filter(Boolean).join('; ')||'Accepted']));}
 function csv(rows){if(!rows.length)return '';const keys=Object.keys(rows[0]),q=x=>'"'+String(x??'').replace(/"/g,'""')+'"';return [keys.map(q).join(','),...rows.map(r=>keys.map(k=>q(r[k])).join(','))].join('\r\n');}
 function download(name,text,type='text/plain'){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([text],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function matchedCalibration(ch,row,nom){
  const target=targetFor(ch,row),lidar=target==='Spike'?'CY5':'Quasar';
- return [lidar,'SYBR'].every(c=>{const a=c==='SYBR'?DATA.sybrCalibration?.[target]?.[nom]:calibrationFor(c,row,nom),e=a?10**(-1/a.slope):null;return a?.ok&&e>1&&e<=2.2;});
+ return [lidar,'SYBR'].every(c=>{const a=c==='SYBR'?DATA.sybrCalibration?.[target]?.[nom]:calibrationFor(c,row,nom),e=a?10**(-1/a.slope):null;return acceptedCalibration(a)&&e>1&&e<=2.2;});
 }
 function median(values){const v=values.filter(Number.isFinite).sort((a,b)=>a-b),n=v.length;return n?n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2:null;}
 let agreementLatest=[];
@@ -210,9 +212,9 @@ function drawAgreement(){if(DATA.dilutionSeries){if(DATA.amp.FAM&&DATA.amp.HEX)d
  const max=Math.max(1,...tr.flatMap(t=>t.x.concat(t.y)))*1.08;
  tr.push({x:[0,max],y:[0,max],name:'Equal estimates',mode:'lines',line:{color:'#78838b',width:2,dash:'dot'}});
  Plotly.react('agreementScatter',tr,{height:490,title:{text:'Paired assay estimates',font:{size:20}},margin:{l:80,r:20,t:60,b:130},legend:{orientation:'h',y:-.28},xaxis:{title:{text:'LIDAR plasmid-equivalent ng/dose'},range:[0,max]},yaxis:{title:{text:'SYBR plasmid-equivalent ng/dose'},range:[0,max]}},{responsive:true,displaylogo:false});
- $('agreementMethod').innerHTML='<p>Default shared lengths: Spike 72, 87, 106, 152, 197 and 258 bp; Ori 65, 75, 85, 105, 145 and 197 bp. Nominal 50/90 bp flags and historical calibration QC are retained. The 66-bp Spike assay is omitted from both reporters because its SYBR calibration failed. Medians summarize assay estimates; assays are not biological replicates. Reporter agreement alone does not establish absolute accuracy.</p>'+table(['Lot / target','Reporter','Fitted λ /bp','Applied λ /bp','Correction status'],result.fits.map(f=>[rows[f.row],f.ch,fmt(f.lambda),fmt(f.applied_lambda),f.reason==='Nonpositive length-decay slope'?'0% correction applied':f.ok?(f.low<=0?'Positive fit; interval includes zero':'Positive fit'):f.reason]))+'<p>Negative fitted slopes are retained in the download; only the applied correction is set to zero. Missing data, incomplete observed ranges and invalid inputs do not silently receive zero correction.</p>';
+ $('agreementMethod').innerHTML='<p>When the shared-calibration restriction is enabled, the standard accepted lengths are Spike 72, 87, 106, 152, 197 and 258 bp; Ori 65, 75, 85, 105, 145 and 197 bp. With the restriction off, 66-bp Spike LIDAR remains usable despite its failed SYBR calibration. The five-point option may add longer assays. Nominal 50/90 bp flags and other calibration QC remain active. Medians summarize assay estimates; assays are not biological replicates. Reporter agreement alone does not establish absolute accuracy.</p>'+table(['Lot / target','Reporter','Fitted λ /bp','Applied λ /bp','Correction status'],result.fits.map(f=>[rows[f.row],f.ch,fmt(f.lambda),fmt(f.applied_lambda),f.reason==='Nonpositive length-decay slope'?'0% correction applied':f.ok?(f.low<=0?'Positive fit; interval includes zero':'Positive fit'):f.reason]))+'<p>Negative fitted slopes are retained in the download; only the applied correction is set to zero. Missing data, incomplete observed ranges and invalid inputs do not silently receive zero correction.</p>';
 }
-$('downloadagreement').onclick=()=>{drawAgreement();download('EN9581_FL8095_reporter_agreement_V21.csv',csv(agreementLatest),'text/csv');};
+$('downloadagreement').onclick=()=>{drawAgreement();download('EN9581_FL8095_reporter_agreement_V22.csv',csv(agreementLatest),'text/csv');};
 
 function drawNoSybrSummary(){
  const result=agreementResults();agreementLatest=result.summary;
@@ -287,7 +289,7 @@ function drawReplicates(){if(!DATA.duplex)return;
  Plotly.react('singlePlot',['CY5','Quasar'].map(ch=>{const rr=result.single.filter(r=>r.channel===ch&&r.second_minus_first_Cq!==null);return{x:rr.map(r=>r.aligned_bp),y:rr.map(r=>r.second_minus_first_Cq),name:targets[ch],mode:'lines+markers',line:{color:colors[ch],width:3}};}),{...lay,title:{text:'EN9581: single-target versus S+O'},xaxis:{title:{text:'Aligned amplicon length (bp)'}},yaxis:{title:{text:'Cq(single) − mean Cq(A/B)'},zeroline:true,zerolinecolor:'#777'}},{responsive:true,displaylogo:false});
  $('replicateDetails').innerHTML=table(['Comparison','Rows','Channel','Column','Aligned bp','First Cq','Second Cq','ΔCq'],replicateLatest.map(r=>[r.kind,r.rows,r.channel,r.column,r.aligned_bp,fmt(r.first_Cq),fmt(r.second_Cq),fmt(r.second_minus_first_Cq)]));
 }
-$('downloadreplicates').onclick=()=>{drawReplicates();download('EN9581_FL8095_duplex_replicates_V21.csv',csv(replicateLatest),'text/csv');};
+$('downloadreplicates').onclick=()=>{drawReplicates();download('EN9581_FL8095_duplex_replicates_V22.csv',csv(replicateLatest),'text/csv');};
 
 function staticContent(){
 $('stockMeasurementTable').innerHTML=table(['Method / source','Spike (ng/µl)','Ori (ng/µl)'],BUNDLE.stockConcentrations.sources.map(s=>[s.method,s.Spike,s.Ori]).concat([['Arithmetic mean — calculator default',BUNDLE.stockConcentrations.means.Spike,BUNDLE.stockConcentrations.means.Ori]]));
@@ -299,7 +301,7 @@ $('seqtable').innerHTML=table(['Target','Column','Oligo name','Instrument bp lab
 $('sources').innerHTML='<h3>Original exports</h3>'+DATA.files.map(f=>'<p><a href="'+esc(f.url)+'">'+esc(f.name)+'</a><br><code>SHA-256 '+f.sha256+'</code></p>').join('');
 $('metadata').innerHTML=table(['Field','Value'],DATA.metadata.filter(r=>r.some(x=>x!==null)).map(r=>r.filter(x=>x!==null)));
 $('caltable').innerHTML='<p>'+esc(DATA.efficiencyNote)+'</p>'+table(['Source','Channel','Target','Nominal assay bp','E','R²','n','QC status'],DATA.calibrationSourceIndices.flatMap(i=>BUNDLE.historicalStandards[i].assays.map(a=>[BUNDLE.historicalStandards[i].title,a.channel,a.target,a.size_bp,fmt(10**(-1/a.slope)),fmt(a.r2),a.n,a.ok?'Passed':a.flags.join('; ')])));
-$('calcmethod').innerHTML='<p>Cq is the first upward crossing of the selected RFU threshold after subtracting the mean of the first baseline cycles. Copies = reference copies × E^(control Cq − sample Cq). Reference copies = target-specific stock ng/µl ÷ dilution × template µl × Avogadro / (working bp × 660 × 10⁹).</p><p>LIDAR retains the dual-LIDAR calibration; SYBR uses the paired target/SYBR calibrations. Missing or failed calibrations receive no automatic concentration estimate. Matching lengths requires acceptance by both reporter calibrations. Nominal 50 and 90 bp assays are bench-excluded; QC-failing historical assays are excluded even in explicit common-factor mode. Raw Cqs remain visible. The manual factor is an assumption, not a measured efficiency.</p><p>The fitted Poisson model regresses −ln(copies) against aligned bp, with a minimum of four accepted lengths. Each copy estimate is corrected by exp(λ × bp). Nonpositive slopes apply 0% correction and retain the raw quantity. Incomplete observed ranges remain unavailable for correction. Slope confidence intervals describe conditional OLS uncertainty only; they omit uncertainty in efficiency, standard concentration, preparation and recovery. A slope interval including zero does not support a well-resolved finite decay length.</p><p>Copy counts convert to plasmid-equivalent mass using the declared plasmid length, then to neat-vaccine concentration using sample volume and dilution, and finally to dose using dose volume. This assay-specific equivalent mass is not a direct measurement of total DNA. No result is rescaled to force equimolarity between plasmid regions. NTCs are visible controls and are never used as concentration standards.</p>';
+$('calcmethod').innerHTML='<p>Cq is the first upward crossing of the selected RFU threshold after subtracting the mean of the first baseline cycles. Copies = reference copies × E^(control Cq − sample Cq). Reference copies = target-specific stock ng/µl ÷ dilution × template µl × Avogadro / (working bp × 660 × 10⁹).</p><p>LIDAR retains the dual-LIDAR calibration; SYBR uses the paired target/SYBR calibrations. Each reporter uses its own accepted assays by default. Missing or failed calibrations receive no automatic concentration estimate. The optional shared-calibration restriction requires acceptance by both reporters. Five-point curves with no other QC failures can be enabled explicitly and carry a limited-range warning; historical range checks remain active. Nominal 50 and 90 bp assays are bench-excluded; QC-failing historical assays are excluded even in explicit common-factor mode. Raw Cqs remain visible. The manual factor is an assumption, not a measured efficiency.</p><p>The fitted Poisson model regresses −ln(copies) against aligned bp, with a minimum of four accepted lengths. Each copy estimate is corrected by exp(λ × bp). Nonpositive slopes apply 0% correction and retain the raw quantity. Incomplete observed ranges remain unavailable for correction. Slope confidence intervals describe conditional OLS uncertainty only; they omit uncertainty in efficiency, standard concentration, preparation and recovery. A slope interval including zero does not support a well-resolved finite decay length.</p><p>Copy counts convert to plasmid-equivalent mass using the declared plasmid length, then to neat-vaccine concentration using sample volume and dilution, and finally to dose using dose volume. This assay-specific equivalent mass is not a direct measurement of total DNA. No result is rescaled to force equimolarity between plasmid regions. NTCs are visible controls and are never used as concentration standards.</p>';
 }
 // Historical standard-curve records retain original nominal assay identities.
 // Their regression x values are log10(copies/µl), not copies/reaction. Template
@@ -329,8 +331,8 @@ if(d&&col>0){for(const row of 'ABCDEFG'){const well=row+col,y=d.w[well];if(!y)co
 $('standardtraceinfo').textContent=tr.length?'Original RFU traces for nominal '+n+' bp, '+ch+'. A–F are 1:1,000 through 1:100,000,000; G is NTC.':'The selected reporter/nominal assay is not present in this historical run.';
 plot('standardtraces',tr,'Historical amplification traces','Cycle','Raw RFU');}
 $('standardtracedetail').addEventListener('toggle',()=>{if($('standardtracedetail').open)drawHistoricalTraces();});
-$('downloadstandards').onclick=()=>download('EN9581_historical_standard_curves_V21.csv',csv(standardPointRecords()),'text/csv');
-$('downloadstandardtraces').onclick=()=>{const rr=[];for(const s of DATA.historicalStandards)for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(s[kind]))for(const [well,y] of Object.entries(d.w))y.forEach((rfu,i)=>rr.push({source:s.key,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_historical_traces_V21.csv',csv(rr),'text/csv');};
+$('downloadstandards').onclick=()=>download('EN9581_historical_standard_curves_V22.csv',csv(standardPointRecords()),'text/csv');
+$('downloadstandardtraces').onclick=()=>{const rr=[];for(const s of DATA.historicalStandards)for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(s[kind]))for(const [well,y] of Object.entries(d.w))y.forEach((rfu,i)=>rr.push({source:s.key,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_historical_traces_V22.csv',csv(rr),'text/csv');};
 
 function redraw(){if(currentTab==='dilution')drawDilution();if(currentTab==='replicates')drawReplicates();if(currentTab==='agreement')drawAgreement();if(currentTab==='traces')drawTraces();if(currentTab==='size')drawSize();if(currentTab==='dna')drawDNA();if(currentTab==='standards')drawStandards();}
 let surfaceRun=null;
@@ -371,10 +373,10 @@ $('surfaceReset').onclick=()=>Plotly.relayout('dnaSurfacePlot',{'scene.camera':{
 
 $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;for(const id of ['dilution','replicates','agreement','traces','size','dna','standards','seq','methods','batch','about'])$(id).hidden=id!==currentTab;$('tabs').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));redraw();});
 for(const e of document.querySelectorAll('input,select'))e.addEventListener('change',redraw);
-$('downloadcsv').onclick=()=>{drawDNA();download('EN9581_calculations_V21.csv',csv(latest.map(r=>({...r,display_poisson:$('poisson').checked,version:BUNDLE.version,run_id:DATA.id}))),'text/csv');};
-$('downloadjson').onclick=()=>download('EN9581_data_V21.json',JSON.stringify(BUNDLE,null,2),'application/json');
-$('downloadalign').onclick=()=>download('EN9581_amplicon_alignment_V21.csv',csv(Object.entries(DATA.amplicons).flatMap(([target,a])=>a.map(m=>({target,column:m.column,oligo:m.name,nominal_bp:m.nominal,aligned_bp:m.bp,start:m.start,end:m.end,forward:m.forward,reverse:m.reverse})))),'text/csv');
-$('downloadraw').onclick=()=>{const rr=[];for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(DATA[kind]))for(const [well,yy] of Object.entries(d.w))yy.forEach((rfu,i)=>rr.push({run_id:DATA.id,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_'+DATA.id+'_raw_traces_V21.csv',csv(rr),'text/csv');};
+$('downloadcsv').onclick=()=>{drawDNA();download('EN9581_calculations_V22.csv',csv(latest.map(r=>({...r,display_poisson:$('poisson').checked,version:BUNDLE.version,run_id:DATA.id}))),'text/csv');};
+$('downloadjson').onclick=()=>download('EN9581_data_V22.json',JSON.stringify(BUNDLE,null,2),'application/json');
+$('downloadalign').onclick=()=>download('EN9581_amplicon_alignment_V22.csv',csv(Object.entries(DATA.amplicons).flatMap(([target,a])=>a.map(m=>({target,column:m.column,oligo:m.name,nominal_bp:m.nominal,aligned_bp:m.bp,start:m.start,end:m.end,forward:m.forward,reverse:m.reverse})))),'text/csv');
+$('downloadraw').onclick=()=>{const rr=[];for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(DATA[kind]))for(const [well,yy] of Object.entries(d.w))yy.forEach((rfu,i)=>rr.push({run_id:DATA.id,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_'+DATA.id+'_raw_traces_V22.csv',csv(rr),'text/csv');};
 // Run switching changes data, controls and provenance together. Confirmation
 // from the new preparation must never unlock the original run's row G.
 const runInputs={};let activeRun=null;
@@ -400,7 +402,7 @@ function selectRun(index){
  $('sybrlabel').hidden=!DATA.amp.SYBR;$('sybr').checked=DATA.hasSybr;
  $('greenChannelLabel').textContent=DATA.hasSybr?'SYBR · intercalator':'Green scan · no SYBR dye (background)';
  $('agreementTitle').textContent=DATA.hasSybr?'SYBR and LIDAR on the same plate':'LIDAR quantities · no SYBR plate';
- $('agreementIntro').textContent=DATA.hasSybr?'Each reporter uses its own historical efficiency and the same-length gBlock control. The default comparison uses six shared accepted assays per target. All values are plasmid-equivalent ng/dose.':'This plate contains no SYBR dye. Only Cy5 Spike and Quasar Ori are quantified. Switch to the SYBR plate to view within-well reporter agreement. The default length selection is held constant between plates.';
+ $('agreementIntro').textContent=DATA.hasSybr?'Each reporter uses its own historical efficiency and the same-length gBlock control. Each reporter uses its own accepted assay lengths; the shared-calibration restriction is optional. All values are plasmid-equivalent ng/dose.':'This plate contains no SYBR dye. Only Cy5 Spike and Quasar Ori are quantified. Switch to the SYBR plate to view within-well reporter agreement. Assay selection follows each reporter’s calibration; a missing SYBR calibration does not by itself exclude LIDAR.';
  $('standardrun').value=String(DATA.calibrationSourceIndices[0]);
  $('standardUseNote').textContent=DATA.efficiencyNote+' Viewing another reference source does not change that assignment.';
  if(DATA.duplex){$('agreementTitle').textContent='Target-resolved LIDAR quantities';$('agreementIntro').textContent='Mixed-well SYBR is not a target-specific concentration measurement. Cy5 and Quasar estimates are shown separately for each row, using the mean Cq of the two gBlock control wells.';}
@@ -435,17 +437,18 @@ function dilutionResults(){
  if(!DATA.dilutionSeries)return {details,summary};
  for(const ch of channels().filter(c=>c!=='SYBR'))for(const row of 'CBA'){
   const target=targets[ch],stock=BUNDLE.stockConcentrations.means[target],dilution=DATA.rowDilutions[row],records=[];
-  for(let col=7;col<=11;col++){
+  for(let col=1;col<=11;col++){
    const sample=cq(ch,row+col),control=cq(ch,'D'+col),ntc=cq(ch,'E'+col);
-   const mass=Number.isFinite(sample)&&Number.isFinite(control)?stock/20000*(7824/400)*dilution*300*2**(control-sample):null;
-   const warnings=[];
+   const excluded=flagged(col)?'Bench-excluded nominal '+nominal[col-1]+' bp assay':(['FAM','HEX'].includes(ch)&&col<7)?'Short assay outside the selected TaqMan quantitation panel; LIDAR retained independently':'';
+   const mass=!excluded&&Number.isFinite(sample)&&Number.isFinite(control)?stock/20000*(7824/400)*dilution*300*2**(control-sample):null;
+   const warnings=excluded?[excluded]:[];
    if(sample===null||control===null)warnings.push('No accepted sample or control crossing');
    if(control>=38)warnings.push('Control crosses at or after cycle 38');
-   if(Number.isFinite(ntc))warnings.push('NTC crosses at '+fmt(ntc)+'; sample–NTC separation '+fmt(ntc-sample)+' cycles');
-   const r={run_id:DATA.id,channel:ch,target,row,well:row+col,control_well:'D'+col,column:col,bp:mapping(ch,col,row).bp,vaccine_dilution:dilution,gblock_dilution:20000,stock_ng_per_uL:stock,gblock_bp:400,plasmid_bp:7824,dose_uL:300,sample_uL:2,control_uL:2,E:2,threshold:numeric('threshold'),baseline:numeric('baseline'),sample_Cq:sample,control_Cq:control,NTC_Cq:ntc,uncorrected_ng_per_dose:mass,poisson_applied:false,warning:warnings.join('; ')};
+   if(Number.isFinite(ntc))warnings.push('NTC crosses at '+fmt(ntc)+(Number.isFinite(sample)?'; sample–NTC separation '+fmt(ntc-sample)+' cycles':''));
+   const r={run_id:DATA.id,channel:ch,target,row,well:row+col,control_well:'D'+col,column:col,bp:mapping(ch,col,row).bp,vaccine_dilution:dilution,gblock_dilution:20000,stock_ng_per_uL:stock,gblock_bp:400,plasmid_bp:7824,dose_uL:300,sample_uL:2,control_uL:2,E:2,threshold:numeric('threshold'),baseline:numeric('baseline'),sample_Cq:sample,control_Cq:control,NTC_Cq:ntc,uncorrected_ng_per_dose:mass,poisson_applied:false,exclusion:excluded,warning:warnings.join('; ')};
    records.push(r);details.push(r);
   }
-  summary.push({channel:ch,target,row,dilution,median_ng_per_dose:median(records.map(r=>r.uncorrected_ng_per_dose)),accepted:records.filter(r=>Number.isFinite(r.uncorrected_ng_per_dose)).length,late_controls:records.filter(r=>r.control_Cq>=38).length});
+  summary.push({channel:ch,target,row,dilution,median_ng_per_dose:median(records.map(r=>r.uncorrected_ng_per_dose)),eligible:records.filter(r=>!r.exclusion).length,accepted:records.filter(r=>Number.isFinite(r.uncorrected_ng_per_dose)).length,late_controls:records.filter(r=>r.control_Cq>=38).length});
  }
  return {details,summary};
 }
@@ -455,7 +458,7 @@ function drawDilution(){
  $('dilutionIntro').textContent=DATA.title+'. A: vaccine 1:1,000; B: 1:100; C: 1:10; D: mixed gBlock 1:20,000 of each target; E and every column 12: NTC. Both DNA inputs are 2 µl. Current threshold '+fmt(numeric('threshold'))+' RFU; baseline '+fmt(numeric('baseline'))+' cycles.';
  $('dilutionQC').textContent=(DATA.hasSybr?'SYBR E5 has target-channel amplification around cycles 30–32; nominal 90 bp has the known early Cy5 dimer.':'FAM column 4 is gradual baseline drift, including in the NTC: its raw traces remain visible, but its crossings are excluded. HEX D10/D11 controls cross near cycle 40; estimates using these are exploratory. Nominal 90 bp retains the known dimer flag.')+' Other target-channel NTC crossings are listed below. The two dilution plates used different cyclers. No technical replicates are declared.';
  $('dilutionTable').innerHTML=table(['Reporter / target','1:10 · C (ng/dose)','1:100 · B (ng/dose)','1:1,000 · A (ng/dose)','Lengths contributing C/B/A'],chs.map(ch=>{
-  const r='CBA'.split('').map(row=>result.summary.find(x=>x.channel===ch&&x.row===row));return [ch+' · '+targets[ch],...r.map(x=>fmt(x.median_ng_per_dose)),r.map(x=>x.accepted+'/5').join(' / ')];
+  const r='CBA'.split('').map(row=>result.summary.find(x=>x.channel===ch&&x.row===row));return [ch+' · '+targets[ch],...r.map(x=>fmt(x.median_ng_per_dose)),r.map(x=>x.accepted+'/'+x.eligible).join(' / ')];
  }));
  const curves=[];
  for(const ch of channels())for(let col=1;col<=11;col++){
@@ -468,7 +471,7 @@ function drawDilution(){
  const quants=[];
  for(const ch of chs)for(const row of 'CBA'){
   const rr=result.details.filter(r=>r.channel===ch&&r.row===row);
-  quants.push({x:rr.map(r=>r.bp),y:rr.map(r=>r.uncorrected_ng_per_dose),name:ch+' · 1:'+DATA.rowDilutions[row],mode:'lines+markers',line:{color:colors[ch],width:3,dash:row==='C'?'solid':row==='B'?'dash':'dot'},text:rr.map(r=>r.well+' / '+r.control_well+' '+r.warning),hovertemplate:'%{text}<br>%{x} bp<br>%{y:.3g} ng/dose<extra>%{fullData.name}</extra>'});
+  quants.push({x:rr.map(r=>r.bp),y:rr.map(r=>r.uncorrected_ng_per_dose),name:ch+' · '+targets[ch]+' · 1:'+DATA.rowDilutions[row],mode:'lines+markers',connectgaps:false,line:{color:colors[ch],width:3,dash:row==='C'?'solid':row==='B'?'dash':'dot'},text:rr.map(r=>r.well+' / '+r.control_well+' '+r.warning),hovertemplate:'%{text}<br>%{x} bp<br>%{y:.3g} ng/dose<extra>%{fullData.name}</extra>'});
  }
  const scale=$('dilutionScale').value,values=quants.flatMap(t=>t.y).filter(v=>Number.isFinite(v)&&v>0),clipped=values.filter(v=>v>200).length;
  const axis={title:{text:'Plasmid-equivalent ng / 300 µl dose'}};
@@ -478,7 +481,7 @@ function drawDilution(){
  $('dilutionScaleNote').textContent=scale==='focus'?clipped+' estimates exceed 200 ng/dose and are outside this focused view. Select Full linear range or Logarithmic to see them.':'All positive estimates shown. The red line marks 10 ng/dose.';
  Plotly.react('dilutionQuantPlot',quants,{height:540,title:{text:'Uncorrected quantities by amplicon'},margin:{l:75,r:20,t:65,b:65},xaxis:{title:{text:'Aligned amplicon length (bp)'}},yaxis:axis,showlegend:false,shapes:[{type:'line',xref:'paper',x0:0,x1:1,y0:10,y1:10,line:{color:'#c22',width:3}}],annotations:[{xref:'paper',x:0.01,xanchor:'left',yref:'y',y:scale==='log'?1:10,yanchor:'bottom',yshift:4,text:'10 ng/dose',showarrow:false,font:{color:'#b11',size:14},bgcolor:'rgba(255,255,255,.92)'}]},{responsive:true,displaylogo:false});
  traceKey('dilutionQuantPlot',quants);
- $('dilutionMethod').textContent='Common amplification factor E = 2 (assumption). ng/dose = target stock / 20,000 × (7,824 / 400) × row vaccine dilution × 300 × 2^(Cq gBlock − Cq vaccine). Equal 2 µl sample and control inputs cancel. Stock means: Spike 1.47375 and Ori 1.01 ng/µl. Five shared columns 7–11 are used to compare both reporters beyond the short-amplicon probe-site constraints. Other assays remain in Traces and Size series. Medians are calculated only from finite sample/control pairs; missing crossings remain unavailable. NTC signals are displayed, not subtracted. These are plasmid-equivalent masses, not direct total-DNA measurements.';
+ $('dilutionMethod').textContent='Common amplification factor E = 2 (assumption). ng/dose = target stock / 20,000 × (7,824 / 400) × row vaccine dilution × 300 × 2^(Cq gBlock − Cq vaccine). Equal 2 µl sample and control inputs cancel. Stock means: Spike 1.47375 and Ori 1.01 ng/µl. LIDAR quantities use all nine non-flagged assays independently, including short assays outside the selected TaqMan panel. Nominal 50/90 bp assays remain excluded. TaqMan quantities retain columns 7–11; short-assay crossings are listed but not converted to quantities. The Reporter agreement tab uses the five shared long assays, so its paired medians can differ from this all-assay DNA summary. Pooled SYBR is not converted to a target-specific quantity. Each missing or excluded assay is listed below with its reason. Medians are calculated only from finite sample/control pairs; missing crossings remain unavailable. NTC signals are displayed, not subtracted. These are plasmid-equivalent masses, not direct total-DNA measurements.';
  $('dilutionDetails').innerHTML=table(['Row','Reporter','bp','Sample Cq','Control Cq','ng/dose','Notes'],result.details.map(r=>[r.row,r.channel,r.bp,fmt(r.sample_Cq),fmt(r.control_Cq),fmt(r.uncorrected_ng_per_dose),r.warning]));
  const ntcs=[];
  for(const ch of channels())for(const w of Object.keys(DATA.amp[ch].w))if(ntcWell(w)){
@@ -487,7 +490,7 @@ function drawDilution(){
  $('dilutionNTCs').innerHTML=table(['Well','Reporter','Accepted Cq','Notes'],ntcs);
  drawDNASurface(result.details);
 }
- $('downloadDilution').onclick=()=>download('EN9581_'+DATA.dilutionKey+'_dilution_quantities_V21.csv',csv(dilutionResults().details),'text/csv');
+ $('downloadDilution').onclick=()=>download('EN9581_'+DATA.dilutionKey+'_dilution_quantities_V22.csv',csv(dilutionResults().details),'text/csv');
 
 function pairedReporterResults(){
  const run=BUNDLE.runs.find(r=>r.dilutionKey==='taqman'), details=[],summary=[],steps=[];
@@ -530,7 +533,7 @@ function drawTaqAgreement(){
  $('taqStepSummary').innerHTML=table(['Target','Paired dilution steps','Median |TaqMan − LIDAR| (Cq)'],['Spike','Ori'].map(target=>{const rr=result.steps.filter(r=>r.target===target);return [target,rr.length,fmt(median(rr.map(r=>Math.abs(r.difference))))];}));
  $('taqAgreeDetails').innerHTML=table(['Target','Well','bp','LIDAR Cq','TaqMan Cq','LIDAR control Cq','TaqMan control Cq','TaqMan/LIDAR'],result.details.map(r=>[r.target,r.well,r.bp,fmt(r.lidar_Cq),fmt(r.taqman_Cq),fmt(r.lidar_control_Cq),fmt(r.taqman_control_Cq),fmt(r.taqman_to_lidar)]));
 }
-$('downloadTaqAgreement').onclick=()=>download('Oct20_TaqMan_LIDAR_agreement_V21.csv',csv(pairedReporterResults().details),'text/csv');
+$('downloadTaqAgreement').onclick=()=>download('Oct20_TaqMan_LIDAR_agreement_V22.csv',csv(pairedReporterResults().details),'text/csv');
 
 $('runselect').innerHTML=BUNDLE.runs.map((r,i)=>'<option value="'+i+'">'+esc(r.title)+'</option>').join('');
 $('runselect').addEventListener('change',()=>selectRun(Number($('runselect').value)));
