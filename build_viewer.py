@@ -1,15 +1,15 @@
-"""Rebuild the self-contained V18 HTML using only committed source assets."""
+"""Rebuild the self-contained V19 HTML using only committed source assets."""
 from pathlib import Path
 import json
 import base64
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "src"
-OUTPUT = ROOT / "viewer" / "LIDAR_Viewer_EN9581_V18.html"
+OUTPUT = ROOT / "viewer" / "LIDAR_Viewer_EN9581_V19.html"
 
 def build():
     data = json.loads((SOURCE / "data.json").read_text())
-    assert data["version"] == "EN9581 V18"
+    assert data["version"] == "EN9581 V19"
     template = (SOURCE / "viewer_template.html").read_text()
     for placeholder in ("/*PLOTLY*/", "/*DATA*/", "/*APP*/"):
         assert template.count(placeholder) == 1

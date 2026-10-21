@@ -1,10 +1,10 @@
-# LIDAR plate viewer — V18
+# LIDAR plate viewer — V19
 
 Public viewer with the three EN9581/FL8095 benchmark plates from V17 and two October 20 dilution plates (SYBR + LIDAR and TaqMan + LIDAR). The Run menu defaults to the new SYBR dilution series. Three historical calibration series remain available. The original publication viewer is separate.
 
 ## Run and rebuild
 
-Install `requirements.txt`, then run `streamlit run streamlit_app.py`. Community Cloud uses branch `main` and entrypoint `streamlit_app.py`. No secrets or database are required. `python build_viewer.py` rebuilds the self-contained `viewer/LIDAR_Viewer_EN9581_V18.html`; the app provides an offline download. Plotly and reviewed methods figures are embedded.
+Install `requirements.txt`, then run `streamlit run streamlit_app.py`. Community Cloud uses branch `main` and entrypoint `streamlit_app.py`. No secrets or database are required. `python build_viewer.py` rebuilds the self-contained `viewer/LIDAR_Viewer_EN9581_V19.html`; the app provides an offline download. Plotly and reviewed methods figures are embedded.
 
 ## Dilution plates
 
@@ -16,4 +16,8 @@ FAM column 4 baseline drift is excluded from accepted Cqs while raw curves and r
 
 ## Verification and provenance
 
-`src/data.json` preserves source filenames and SHA-256 hashes, raw amplification/melt values, metadata and confirmed row assignments. `verification/EN9581_verification_V18.json` records checks of 420 Cqs, 90 per-assay quantities, row-specific dilution handling, FAM drift exclusion, all imported curves and unchanged V17 run/calibration data. Exact fluor–quencher modification positions are not published. The withdrawn October 14 plate is not included. Previous releases are recoverable in Git history.
+`src/data.json` preserves source filenames and SHA-256 hashes, raw amplification/melt values, metadata and confirmed row assignments. `verification/EN9581_verification_V19.json` records checks of 420 Cqs, 90 per-assay quantities, row-specific dilution handling, FAM drift exclusion, all imported curves and unchanged V17 run/calibration data. Exact fluor–quencher modification positions are not published. The withdrawn October 14 plate is not included. Previous releases are recoverable in Git history.
+
+## V19 display and agreement update
+
+The quantity chart defaults to 0–200 ng/dose with a labeled red 10 ng/dose reference. A count identifies estimates above the visible range; full linear and logarithmic views retain them. The new TaqMan–LIDAR agreement tab is accessible from both October 20 runs and explicitly compares same-well reporters on the TaqMan plate. It includes matched five-length quantities for all three dilutions, paired ratios, equal-axis diagonal plots, late-control markers, dilution-step differences and per-pair CSV downloads. All underlying run data and quantities are unchanged.
