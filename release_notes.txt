@@ -1,0 +1,1 @@
+V20: Stable tab names and order for every plate. DNA estimates, per-assay quantities, NTC details and downloads are always under DNA calculator. Dilution response contains Cq curves; Reporter agreement uses only the selected plate. Unavailable analyses show explanatory messages. Switching runs keeps the current tab. Numerical methods and input data are unchanged.

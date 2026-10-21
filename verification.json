@@ -1,0 +1,19 @@
+{
+  "runs": 5,
+  "paired_reporter_quantities_verified": 30,
+  "dilution_step_comparisons_verified": 20,
+  "late_controls_flagged": 6,
+  "three_scale_modes_verified": true,
+  "scale_changes_preserve_values": true,
+  "original_three_runs_unchanged": true,
+  "historical_calibrations_unchanged": true,
+  "Cqs_verified": 420,
+  "quantities_verified": 90,
+  "all_recorded_traces_rendered": true,
+  "FAM4_drift_excluded": true,
+  "NTC_row_E_identified": true,
+  "row_dilutions_verified": true,
+  "threshold_recalculation_verified": true,
+  "old_run_panels_verified": true,
+  "public_modification_marker_scan_passed": true
+}

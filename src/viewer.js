@@ -1,5 +1,5 @@
 'use strict';
-// EN9581 V19. All input data are embedded in DATA. No network calibration,
+// EN9581 V20. All input data are embedded in DATA. No network calibration,
 // hidden target normalization or data from another vaccine lot is used.
 const $=id=>document.getElementById(id), NA=6.02214076e23;
 let DATA={...BUNDLE,...BUNDLE.runs[BUNDLE.defaultRun]};
@@ -19,7 +19,7 @@ let pairs={A:'E',B:'F',C:'E',D:'F'}; const nominal=[40,50,60,70,80,90,100,150,20
 // The mixture concentration is a physical input, not inferred from its Cq.
 // Confirmation belongs to a specific preparation; a remade control does not
 // retrospectively establish the concentration in the earlier run.
-let selected=new Set(['E1','F1','G1']), currentTab='dilution', latest=[];
+let selected=new Set(['E1','F1','G1']), currentTab='dna', latest=[];
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=x=>Number.isFinite(x)?(Math.abs(x)>=10000||Math.abs(x)>0&&Math.abs(x)<0.001?x.toExponential(3):Number(x.toPrecision(4)).toString()):'—';
 const mean=x=>x.reduce((a,b)=>a+b,0)/x.length;
@@ -125,7 +125,7 @@ const zeroCorrection=fit.reason==='Nonpositive length-decay slope';fit.applied_l
 for(const key of ['raw','model']){r[key+'_ng_per_ul']=r[key]===null?null:ngFromCopies(r[key],P.plasmidbp)/P.samplevol*P.vdil;r[key+'_ng_per_dose']=r[key+'_ng_per_ul']===null?null:r[key+'_ng_per_ul']*P.dose;}
 all.push(r);}}
 return {all,fits};}
-function drawDNA(){const P=settings(),mode=$('effmode').value,poisson=$('poisson').checked,answer=calculate(P,mode,poisson);latest=answer.all;
+function drawDNA(){if(DATA.dilutionSeries){drawDilution();return;}const P=settings(),mode=$('effmode').value,poisson=$('poisson').checked,answer=calculate(P,mode,poisson);latest=answer.all;
 $('inputsummary').textContent=answer.error||['Spike','Ori'].map(target=>{const stock=target==='Spike'?P.stockSpike:P.stockOri,mass=stock/P.gdil*P.stdvol;return target+' gBlock input: '+fmt(mass)+' ng = '+fmt(copiesFromNg(mass,P.gbp))+' copies/reaction';}).join('; ')+'. Vaccine input: '+fmt(P.samplevol/P.vdil)+' µl original vaccine/reaction.';
 $('fitstatus').innerHTML=answer.fits.map(f=>'<p>'+esc(f.row+' · '+channelLabel(f.ch,f.row)+': '+(f.ok?'effective decay length '+fmt(f.decay)+' bp; λ '+fmt(f.lambda)+'/bp; 95% conditional slope interval '+fmt(f.low)+' to '+fmt(f.high)+'; R² '+fmt(f.r2)+'; n='+f.n+(f.low<=0?' · Weak fit: slope interval includes zero; finite decay length is poorly constrained.':''):f.reason==='Nonpositive length-decay slope'?'0% correction applied; fitted λ '+fmt(f.lambda)+'/bp':f.reason))+'</p>').join('');
 const unit=$('units').value;
@@ -195,7 +195,7 @@ function agreementResults(){if(DATA.dilutionSeries)return {all:[],fits:[],summar
  }
  return {...answer,summary};
 }
-function drawAgreement(){
+function drawAgreement(){if(DATA.dilutionSeries){if(DATA.amp.FAM&&DATA.amp.HEX)drawTaqAgreement();return;}
  $('agreementScatter').hidden=!DATA.hasSybr||DATA.duplex;
  if(DATA.duplex){drawDuplexSummary();return;}
  if(!DATA.hasSybr){drawNoSybrSummary();return;}
@@ -212,7 +212,7 @@ function drawAgreement(){
  Plotly.react('agreementScatter',tr,{height:490,title:{text:'Paired assay estimates',font:{size:20}},margin:{l:80,r:20,t:60,b:130},legend:{orientation:'h',y:-.28},xaxis:{title:{text:'LIDAR plasmid-equivalent ng/dose'},range:[0,max]},yaxis:{title:{text:'SYBR plasmid-equivalent ng/dose'},range:[0,max]}},{responsive:true,displaylogo:false});
  $('agreementMethod').innerHTML='<p>Default shared lengths: Spike 72, 87, 106, 152, 197 and 258 bp; Ori 65, 75, 85, 105, 145 and 197 bp. Nominal 50/90 bp flags and historical calibration QC are retained. The 66-bp Spike assay is omitted from both reporters because its SYBR calibration failed. Medians summarize assay estimates; assays are not biological replicates. Reporter agreement alone does not establish absolute accuracy.</p>'+table(['Lot / target','Reporter','Fitted λ /bp','Applied λ /bp','Correction status'],result.fits.map(f=>[rows[f.row],f.ch,fmt(f.lambda),fmt(f.applied_lambda),f.reason==='Nonpositive length-decay slope'?'0% correction applied':f.ok?(f.low<=0?'Positive fit; interval includes zero':'Positive fit'):f.reason]))+'<p>Negative fitted slopes are retained in the download; only the applied correction is set to zero. Missing data, incomplete observed ranges and invalid inputs do not silently receive zero correction.</p>';
 }
-$('downloadagreement').onclick=()=>{drawAgreement();download('EN9581_FL8095_reporter_agreement_V19.csv',csv(agreementLatest),'text/csv');};
+$('downloadagreement').onclick=()=>{drawAgreement();download('EN9581_FL8095_reporter_agreement_V20.csv',csv(agreementLatest),'text/csv');};
 
 function drawNoSybrSummary(){
  const result=agreementResults();agreementLatest=result.summary;
@@ -276,7 +276,7 @@ function drawReproducibility(result){
   Plotly.react('repro'+ch,traces,{height:560,title:{text:ch==='CY5'?'Cy5 · Spike':ch==='Quasar'?'Quasar 705 · Ori':'SYBR · combined signal',font:{size:19}},margin:{l:70,r:20,t:60,b:155},xaxis:{title:{text:'Replicate 1 Cq'},range,constrain:'domain'},yaxis:{title:{text:'Replicate 2 Cq'},range,scaleanchor:'x',scaleratio:1,constrain:'domain'},legend:{orientation:'h',y:-.23,x:0,font:{size:12}},hovermode:'closest',paper_bgcolor:'#fff',plot_bgcolor:'#fff'},{responsive:true,displaylogo:false,toImageButtonOptions:{format:'png',scale:3,filename:'LIDAR_reproducibility_'+ch}});
  }
 }
-function drawReplicates(){
+function drawReplicates(){if(!DATA.duplex)return;
  if(!DATA.duplex){drawReproducibility({details:[],summary:[]});$('replicateIntro').textContent='Select the S+O+SYBR duplicate run to view this comparison.';$('replicateTable').innerHTML='';$('replicateDetails').innerHTML='';Plotly.react('replicatePlot',[],{});Plotly.react('singlePlot',[],{});return;}
  const result=replicateResults();drawReproducibility(result);replicateLatest=result.details.concat(result.single);
  $('replicateIntro').textContent='A/B: EN9581; C/D: FL8095; E/F: mixed gBlock. G/H: EN9581 Spike/Ori alone. Nine lengths per channel are shown after the inherited nominal 50/90-bp exclusions; historical calibration filters are not needed for these Cq comparisons. Positive differences mean the second row is later. R² measures association across lengths, while absolute Cq differences measure repeatability.';
@@ -287,7 +287,7 @@ function drawReplicates(){
  Plotly.react('singlePlot',['CY5','Quasar'].map(ch=>{const rr=result.single.filter(r=>r.channel===ch&&r.second_minus_first_Cq!==null);return{x:rr.map(r=>r.aligned_bp),y:rr.map(r=>r.second_minus_first_Cq),name:targets[ch],mode:'lines+markers',line:{color:colors[ch],width:3}};}),{...lay,title:{text:'EN9581: single-target versus S+O'},xaxis:{title:{text:'Aligned amplicon length (bp)'}},yaxis:{title:{text:'Cq(single) − mean Cq(A/B)'},zeroline:true,zerolinecolor:'#777'}},{responsive:true,displaylogo:false});
  $('replicateDetails').innerHTML=table(['Comparison','Rows','Channel','Column','Aligned bp','First Cq','Second Cq','ΔCq'],replicateLatest.map(r=>[r.kind,r.rows,r.channel,r.column,r.aligned_bp,fmt(r.first_Cq),fmt(r.second_Cq),fmt(r.second_minus_first_Cq)]));
 }
-$('downloadreplicates').onclick=()=>{drawReplicates();download('EN9581_FL8095_duplex_replicates_V19.csv',csv(replicateLatest),'text/csv');};
+$('downloadreplicates').onclick=()=>{drawReplicates();download('EN9581_FL8095_duplex_replicates_V20.csv',csv(replicateLatest),'text/csv');};
 
 function staticContent(){
 $('stockMeasurementTable').innerHTML=table(['Method / source','Spike (ng/µl)','Ori (ng/µl)'],BUNDLE.stockConcentrations.sources.map(s=>[s.method,s.Spike,s.Ori]).concat([['Arithmetic mean — calculator default',BUNDLE.stockConcentrations.means.Spike,BUNDLE.stockConcentrations.means.Ori]]));
@@ -329,16 +329,16 @@ if(d&&col>0){for(const row of 'ABCDEFG'){const well=row+col,y=d.w[well];if(!y)co
 $('standardtraceinfo').textContent=tr.length?'Original RFU traces for nominal '+n+' bp, '+ch+'. A–F are 1:1,000 through 1:100,000,000; G is NTC.':'The selected reporter/nominal assay is not present in this historical run.';
 plot('standardtraces',tr,'Historical amplification traces','Cycle','Raw RFU');}
 $('standardtracedetail').addEventListener('toggle',()=>{if($('standardtracedetail').open)drawHistoricalTraces();});
-$('downloadstandards').onclick=()=>download('EN9581_historical_standard_curves_V19.csv',csv(standardPointRecords()),'text/csv');
-$('downloadstandardtraces').onclick=()=>{const rr=[];for(const s of DATA.historicalStandards)for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(s[kind]))for(const [well,y] of Object.entries(d.w))y.forEach((rfu,i)=>rr.push({source:s.key,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_historical_traces_V19.csv',csv(rr),'text/csv');};
+$('downloadstandards').onclick=()=>download('EN9581_historical_standard_curves_V20.csv',csv(standardPointRecords()),'text/csv');
+$('downloadstandardtraces').onclick=()=>{const rr=[];for(const s of DATA.historicalStandards)for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(s[kind]))for(const [well,y] of Object.entries(d.w))y.forEach((rfu,i)=>rr.push({source:s.key,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_historical_traces_V20.csv',csv(rr),'text/csv');};
 
-function redraw(){if(currentTab==='taqagreement')drawTaqAgreement();if(currentTab==='dilution')drawDilution();if(currentTab==='replicates')drawReplicates();if(currentTab==='agreement')drawAgreement();if(currentTab==='traces')drawTraces();if(currentTab==='size')drawSize();if(currentTab==='dna')drawDNA();if(currentTab==='standards')drawStandards();}
-$('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;for(const id of ['taqagreement','dilution','replicates','agreement','traces','size','dna','standards','seq','methods','batch','about'])$(id).hidden=id!==currentTab;$('tabs').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));redraw();});
+function redraw(){if(currentTab==='dilution')drawDilution();if(currentTab==='replicates')drawReplicates();if(currentTab==='agreement')drawAgreement();if(currentTab==='traces')drawTraces();if(currentTab==='size')drawSize();if(currentTab==='dna')drawDNA();if(currentTab==='standards')drawStandards();}
+$('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{currentTab=b.dataset.tab;for(const id of ['dilution','replicates','agreement','traces','size','dna','standards','seq','methods','batch','about'])$(id).hidden=id!==currentTab;$('tabs').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));redraw();});
 for(const e of document.querySelectorAll('input,select'))e.addEventListener('change',redraw);
-$('downloadcsv').onclick=()=>{drawDNA();download('EN9581_calculations_V19.csv',csv(latest.map(r=>({...r,display_poisson:$('poisson').checked,version:BUNDLE.version,run_id:DATA.id}))),'text/csv');};
-$('downloadjson').onclick=()=>download('EN9581_data_V19.json',JSON.stringify(BUNDLE,null,2),'application/json');
-$('downloadalign').onclick=()=>download('EN9581_amplicon_alignment_V19.csv',csv(Object.entries(DATA.amplicons).flatMap(([target,a])=>a.map(m=>({target,column:m.column,oligo:m.name,nominal_bp:m.nominal,aligned_bp:m.bp,start:m.start,end:m.end,forward:m.forward,reverse:m.reverse})))),'text/csv');
-$('downloadraw').onclick=()=>{const rr=[];for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(DATA[kind]))for(const [well,yy] of Object.entries(d.w))yy.forEach((rfu,i)=>rr.push({run_id:DATA.id,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_'+DATA.id+'_raw_traces_V19.csv',csv(rr),'text/csv');};
+$('downloadcsv').onclick=()=>{drawDNA();download('EN9581_calculations_V20.csv',csv(latest.map(r=>({...r,display_poisson:$('poisson').checked,version:BUNDLE.version,run_id:DATA.id}))),'text/csv');};
+$('downloadjson').onclick=()=>download('EN9581_data_V20.json',JSON.stringify(BUNDLE,null,2),'application/json');
+$('downloadalign').onclick=()=>download('EN9581_amplicon_alignment_V20.csv',csv(Object.entries(DATA.amplicons).flatMap(([target,a])=>a.map(m=>({target,column:m.column,oligo:m.name,nominal_bp:m.nominal,aligned_bp:m.bp,start:m.start,end:m.end,forward:m.forward,reverse:m.reverse})))),'text/csv');
+$('downloadraw').onclick=()=>{const rr=[];for(const kind of ['amp','melt'])for(const [ch,d] of Object.entries(DATA[kind]))for(const [well,yy] of Object.entries(d.w))yy.forEach((rfu,i)=>rr.push({run_id:DATA.id,kind,channel:ch,well,x:d.x[i],RFU:rfu}));download('EN9581_'+DATA.id+'_raw_traces_V20.csv',csv(rr),'text/csv');};
 // Run switching changes data, controls and provenance together. Confirmation
 // from the new preparation must never unlock the original run's row G.
 const runInputs={};let activeRun=null;
@@ -346,7 +346,7 @@ function selectRun(index){
  if(activeRun!==null)runInputs[activeRun]=settings();
  DATA={...BUNDLE,...BUNDLE.runs[index]};activeRun=index;
  rows=DATA.rowLabels||{A:'EN9581 · Spike',B:'EN9581 · Ori',C:'FL8095 · Spike',D:'FL8095 · Ori',E:'gBlock · Spike',F:'gBlock · Ori'};pairs=DATA.sampleToControl||{A:'E',B:'F',C:'E',D:'F'};
- $('replicateTab').hidden=!DATA.duplex;
+
  const inputs=runInputs[index]||DATA.defaults;
  for(const [id,value] of Object.entries(inputs))if($(id))$(id).value=value;
  $('runselect').value=String(index);
@@ -368,19 +368,27 @@ function selectRun(index){
  $('standardrun').value=String(DATA.calibrationSourceIndices[0]);
  $('standardUseNote').textContent=DATA.efficiencyNote+' Viewing another reference source does not change that assignment.';
  if(DATA.duplex){$('agreementTitle').textContent='Target-resolved LIDAR quantities';$('agreementIntro').textContent='Mixed-well SYBR is not a target-specific concentration measurement. Cy5 and Quasar estimates are shown separately for each row, using the mean Cq of the two gBlock control wells.';}
+ $('dnaLegacy').hidden=!!DATA.dilutionSeries;
+ $('dnaDilution').hidden=!DATA.dilutionSeries;
+ $('dilutionAvailable').hidden=!DATA.dilutionSeries;
+ $('dilutionUnavailable').hidden=!!DATA.dilutionSeries;
+ $('replicateAvailable').hidden=!DATA.duplex;
+ $('replicateUnavailable').hidden=!!DATA.duplex;
+ $('agreementLegacy').hidden=!!DATA.dilutionSeries;
+ $('taqagreement').hidden=!(DATA.dilutionSeries&&DATA.amp.FAM&&DATA.amp.HEX);
+ $('agreementUnavailable').hidden=!(DATA.dilutionSeries&&!(DATA.amp.FAM&&DATA.amp.HEX));
  selected=new Set(DATA.duplex?['A7','B7','G7','H7']:['A7','C7','E7']);latest=[];
  staticContent();plate();
- $('dilutionTab').hidden=!DATA.dilutionSeries;$('taqAgreementTab').hidden=!DATA.dilutionSeries;
+
  $('famlabel').hidden=!DATA.amp.FAM;$('hexlabel').hidden=!DATA.amp.HEX;
- $('tabs').querySelectorAll('button').forEach(button=>{if(['dna','agreement'].includes(button.dataset.tab))button.hidden=!!DATA.dilutionSeries;});
+
  if(DATA.dilutionSeries){
   $('runsummary').textContent=DATA.title+' · 60 wells · '+rawChannels().join(', ');
   $('traceRunName').textContent=DATA.title+' · A 1:1,000; B 1:100; C 1:10; D gBlock 1:20,000; E NTC';
   $('arrayRunNote').textContent=DATA.hasSybr?'Mixed-target SYBR with Cy5 and Quasar LIDAR.':'FAM Spike and HEX Ori TaqMan with Cy5 and Quasar LIDAR.';
   selected=new Set(['A7','B7','C7','D7','E7']);plate();
  }
- if(DATA.dilutionSeries&&['dna','agreement','replicates'].includes(currentTab)||!DATA.dilutionSeries&&['dilution','taqagreement'].includes(currentTab))currentTab=DATA.dilutionSeries?'dilution':DATA.duplex?'replicates':'agreement';
- for(const id of ['taqagreement','dilution','replicates','agreement','traces','size','dna','standards','seq','methods','batch','about'])$(id).hidden=id!==currentTab;
+ for(const id of ['dilution','replicates','agreement','traces','size','dna','standards','seq','methods','batch','about'])$(id).hidden=id!==currentTab;
  $('tabs').querySelectorAll('button').forEach(button=>button.classList.toggle('active',button.dataset.tab===currentTab));
  redraw();
 }
@@ -442,7 +450,7 @@ function drawDilution(){
  }
  $('dilutionNTCs').innerHTML=table(['Well','Reporter','Accepted Cq','Notes'],ntcs);
 }
- $('downloadDilution').onclick=()=>download('EN9581_'+DATA.dilutionKey+'_dilution_quantities_V19.csv',csv(dilutionResults().details),'text/csv');
+ $('downloadDilution').onclick=()=>download('EN9581_'+DATA.dilutionKey+'_dilution_quantities_V20.csv',csv(dilutionResults().details),'text/csv');
 
 function pairedReporterResults(){
  const run=BUNDLE.runs.find(r=>r.dilutionKey==='taqman'), details=[],summary=[],steps=[];
@@ -468,7 +476,7 @@ function pairedReporterResults(){
 }
 function drawTaqAgreement(){
  const result=pairedReporterResults();
- $('taqAgreeIntro').textContent='Same-well comparison on the 20 October TaqMan + LIDAR plate: FAM versus Cy5 for Spike, and HEX versus Quasar 705 for Ori. Each reporter uses its own same-length D-row gBlock Cq. The SYBR plate has no TaqMan channel; this tab shows the paired TaqMan plate from either October 20 run. Current threshold '+fmt(numeric('threshold'))+' RFU; baseline '+fmt(numeric('baseline'))+' cycles.';
+ $('taqAgreeIntro').textContent='Same-well comparison on the selected 20 October TaqMan + LIDAR plate: FAM versus Cy5 for Spike, and HEX versus Quasar 705 for Ori. Each reporter uses its own same-length D-row gBlock Cq. Current threshold '+fmt(numeric('threshold'))+' RFU; baseline '+fmt(numeric('baseline'))+' cycles.';
  $('taqAgreeTable').innerHTML=table(['Target','Vaccine dilution','Paired lengths','LIDAR ng/dose','TaqMan ng/dose','Median paired TaqMan/LIDAR','Late control pairs'],result.summary.map(r=>[r.target,'1:'+r.dilution,r.n+'/5',fmt(r.lidar),fmt(r.taqman),fmt(r.fold)+'×',r.late]));
  for(const target of ['Spike','Ori']){
   const rr=result.details.filter(r=>r.target===target&&r.lidar_ng_per_dose>0&&r.taqman_ng_per_dose>0),values=rr.flatMap(r=>[r.lidar_ng_per_dose,r.taqman_ng_per_dose]);
@@ -485,7 +493,7 @@ function drawTaqAgreement(){
  $('taqStepSummary').innerHTML=table(['Target','Paired dilution steps','Median |TaqMan − LIDAR| (Cq)'],['Spike','Ori'].map(target=>{const rr=result.steps.filter(r=>r.target===target);return [target,rr.length,fmt(median(rr.map(r=>Math.abs(r.difference))))];}));
  $('taqAgreeDetails').innerHTML=table(['Target','Well','bp','LIDAR Cq','TaqMan Cq','LIDAR control Cq','TaqMan control Cq','TaqMan/LIDAR'],result.details.map(r=>[r.target,r.well,r.bp,fmt(r.lidar_Cq),fmt(r.taqman_Cq),fmt(r.lidar_control_Cq),fmt(r.taqman_control_Cq),fmt(r.taqman_to_lidar)]));
 }
-$('downloadTaqAgreement').onclick=()=>download('Oct20_TaqMan_LIDAR_agreement_V19.csv',csv(pairedReporterResults().details),'text/csv');
+$('downloadTaqAgreement').onclick=()=>download('Oct20_TaqMan_LIDAR_agreement_V20.csv',csv(pairedReporterResults().details),'text/csv');
 
 $('runselect').innerHTML=BUNDLE.runs.map((r,i)=>'<option value="'+i+'">'+esc(r.title)+'</option>').join('');
 $('runselect').addEventListener('change',()=>selectRun(Number($('runselect').value)));
