@@ -53,7 +53,7 @@ function traceKey(id,data){
  });
 }
 function plot(id,data,title,x,y,extra={},overlays={}){
- const isTrace=id==='ampplot'||id==='meltplot';
+ const isTrace=id==='ampplot'||id==='meltplot'||id==='sizeplot';
  const result=Plotly.react(id,data,{title:{text:title,font:{size:20}},font:{family:'system-ui',size:14},margin:{l:85,r:25,t:isTrace?60:90,b:65},xaxis:{title:{text:x}},yaxis:{title:{text:y},...extra},showlegend:!isTrace,legend:{orientation:'h',y:1.12},hovermode:'closest',paper_bgcolor:'#fff',plot_bgcolor:'#fff',...overlays},{responsive:true,displaylogo:false,toImageButtonOptions:{format:'png',scale:2}});
  if(isTrace)traceKey(id,data);
  return result;
@@ -73,7 +73,7 @@ function drawSize(){const tr=[];for(const row of sampleRows())for(const ch of ch
  if(!targetFor(ch,row)||!DATA.amp[ch].w[row+'1']||(DATA.duplex&&ch==='SYBR'))continue;
  const pts=[];for(let col=1;col<=11;col++){if($('hideflag').checked&&flagged(col))continue;
  const a=cq(ch,row+col),b=referenceCq(ch,row,col);if(a!==null&&b!==null)pts.push({x:mapping(ch,col,row).bp,y:a-b});}
- if(pts.length)tr.push({x:pts.map(p=>p.x),y:pts.map(p=>p.y),name:rows[row]+' · '+(ch==='SYBR'?'SYBR':ch==='FAM'||ch==='HEX'?ch+' TaqMan':'LIDAR'),mode:'lines+markers',line:{color:colors[ch],width:3,dash:'CD'.includes(row)?'dash':'solid'}});
+ if(pts.length)tr.push({x:pts.map(p=>p.x),y:pts.map(p=>p.y),name:rows[row]+' · '+targetFor(ch,row)+' · '+(ch==='CY5'?'Cy5 LIDAR':ch==='Quasar'?'Quasar 705 LIDAR':ch==='SYBR'?'SYBR':ch+' TaqMan'),mode:'lines+markers',line:{color:colors[ch],width:3,dash:'CD'.includes(row)?'dash':'solid'}});
 }plot('sizeplot',tr,'Length-dependent Cq difference','Aligned amplicon length (bp)','Cq(vaccine) − Cq(gBlock)');}
 // Mass to molecules: ng -> g, divide by bp × 660 g/mol/bp, then multiply
 // by Avogadro's constant. This declared mass convention is independent of
