@@ -15,5 +15,11 @@
   "row_dilutions_verified": true,
   "threshold_recalculation_verified": true,
   "old_run_panels_verified": true,
-  "public_modification_marker_scan_passed": true
+  "public_modification_marker_scan_passed": true,
+  "rotatable_3D_all_five_runs": true,
+  "surface_values_match_calculator": true,
+  "surface_missing_values_not_interpolated": true,
+  "surface_log_preserves_values": true,
+  "surface_corrected_values_match": true,
+  "surface_mixed_SYBR_excluded": true
 }
