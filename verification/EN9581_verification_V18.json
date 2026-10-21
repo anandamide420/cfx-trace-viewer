@@ -1,0 +1,14 @@
+{
+  "runs": 5,
+  "original_three_runs_unchanged": true,
+  "historical_calibrations_unchanged": true,
+  "Cqs_verified": 420,
+  "quantities_verified": 90,
+  "all_recorded_traces_rendered": true,
+  "FAM4_drift_excluded": true,
+  "NTC_row_E_identified": true,
+  "row_dilutions_verified": true,
+  "threshold_recalculation_verified": true,
+  "old_run_panels_verified": true,
+  "public_modification_marker_scan_passed": true
+}

@@ -1,0 +1,1 @@
+V18 adds the two October 20 dilution plates with confirmed row-specific dilution factors, full raw amplification/melt data, FAM/HEX channels, NTC row E, FAM column 4 baseline-drift exclusion, and explicit E=2 uncorrected quantities. Three V17 benchmark runs and historical calibration data remain unchanged. Public prober modification positions remain undisclosed.
